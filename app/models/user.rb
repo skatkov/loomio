@@ -6,10 +6,18 @@ class User < ActiveRecord::Base
   require 'digest/md5'
 
   AVATAR_KINDS = %w[initials uploaded gravatar]
+
   LARGE_IMAGE = 170
   MED_LARGE_IMAGE = 70
   MEDIUM_IMAGE = 35
   SMALL_IMAGE = 25
+
+  # the same is in mixins.scss
+  BOX_TINY = 20
+  BOX_SMALL = 30
+  BOX_MEDIUM = 50
+  BOX_LARGE = 80
+
   MAX_AVATAR_IMAGE_SIZE_CONST = 10.megabytes
 
   devise :database_authenticatable, :recoverable, :registerable, :rememberable, :trackable, :omniauthable
@@ -25,6 +33,10 @@ class User < ActiveRecord::Base
               medlarge: "#{User::MED_LARGE_IMAGE}x#{User::MED_LARGE_IMAGE}#",
               medium: "#{User::MEDIUM_IMAGE}x#{User::MEDIUM_IMAGE}#",
               small: "#{User::SMALL_IMAGE}x#{User::SMALL_IMAGE}#",
+              box_tiny: "20x20#",
+              box_small: "30x30#",
+              box_medium: "50x50#",
+              box_large: "80x80#"
             }
   validates_attachment :uploaded_avatar,
     size: { in: 0..User::MAX_AVATAR_IMAGE_SIZE_CONST.kilobytes },
@@ -281,23 +293,23 @@ class User < ActiveRecord::Base
     I18n.t(:inactive_html, path_to_contact: '/contact').html_safe
   end
 
-  def avatar_url(size=nil)
-    size = size ? size.to_sym : :medium
-    case size
-    when :small
-      pixels = User::SMALL_IMAGE
-    when :medium
-      pixels = User::MEDIUM_IMAGE
-    when :"med-large"
-      pixels = User::MED_LARGE_IMAGE
-    when :large
-      pixels = User::LARGE_IMAGE
-    else
-      pixels = User::SMALL_IMAGE
-    end
+  def avatar_url(size = :medium)
+    size = size.downcase.to_sym
 
     if avatar_kind == "gravatar"
-      gravatar_url(:size => pixels)
+      pixels = case size
+               when :box_tiny    then BOX_TINY
+               when :box_small   then BOX_SMALL
+               when :box_medium  then BOX_MEDIUM
+               when :box_large   then BOX_LARGE
+               when :small       then SMALL_IMAGE
+               when :medium      then MEDIUM_IMAGE
+               when :"med-large" then MED_LARGE_IMAGE
+               when :large       then LARGE_IMAGE
+               else
+                 SMALL_IMAGE
+               end
+      gravatar_url(size: pixels)
     else
       uploaded_avatar.url(size)
     end
