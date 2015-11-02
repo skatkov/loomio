@@ -1,9 +1,9 @@
 .group-theme
-  .group-theme__cover{ng-style:'coverStyle()'}
-    .group-theme__upload-photo{ng-mouseover: 'themeHoverIn()', ng-mouseleave: 'themeHoverOut()', ng-if: 'canUploadPhotos()'}
+  .group-theme__cover{ng-mouseover: 'themeHoverIn()', ng-mouseleave: 'themeHoverOut()', ng-style:'coverStyle()'}
+    .group-theme__upload-photo{ng-if: 'canUploadPhotos()'}
       %button.lmo-btn-link{ng-click: 'openUploadCoverForm()', title: "{{ 'group_page.new_photo' | translate }}"}
         %i.fa.fa-lg.fa-camera
-        %span.group-theme__upload-help-text{ng-show: 'themeHover'} new photo
+        %span.group-theme__upload-help-text{ng-show: 'themeHover', translate: 'group_page.new_photo'}
 
 
   .group-theme__header--compact{ng-if: 'compact'}
@@ -18,8 +18,8 @@
         {{group.name}}
 
   .group-theme__header{ng-if: '!compact'}
-    .group-theme__logo{ng-style:'logoStyle()', alt: "{{ 'group_page.group_logo' | translate }}"}
-      .group-theme__upload-photo{ng-mouseover: 'logoHoverIn()', ng-mouseleave: 'logoHoverOut()', ng-if: 'canUploadPhotos()'}
+    .group-theme__logo{ng-mouseover: 'logoHoverIn()', ng-mouseleave: 'logoHoverOut()', ng-style:'logoStyle()', alt: "{{ 'group_page.group_logo' | translate }}"}
+      .group-theme__upload-photo{ng-if: 'canUploadPhotos()'}
         %button.lmo-btn-link{ng-click: 'openUploadLogoForm()', title: "{{ 'group_page.new_photo' | translate }}"}
           %i.fa.fa-lg.fa-camera
           %span.group-theme__upload-help-text{ng-show: 'logoHover', translate: 'group_page.new_photo'}
