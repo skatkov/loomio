@@ -99,14 +99,17 @@ class Queries::VisibleDiscussions < Delegator
   end
 
   def sorted_by_importance
-    join_to_starred_motions && join_to_motions
-    @relation = @relation.order('smo.closing_at ASC, mo.closing_at ASC, dv.starred DESC NULLS LAST, last_activity_at DESC')
-    self
+    if @user.is_logged_in?
+      join_to_starred_motions && join_to_motions
+      @relation = @relation.order('smo.closing_at ASC, mo.closing_at ASC, dv.starred DESC NULLS LAST, last_activity_at DESC')
+      self
+    else
+      @relation = @relation.order(last_activity_at: :desc)
+      self
+    end
   end
 
   def self.apply_privacy_sql(user: nil, group_ids: [], relation: nil)
-    user_group_ids = user.nil? ? [] : user.cached_group_ids
-
     # select where
     # the discussion is public
     # or they are a member of the group
@@ -117,7 +120,7 @@ class Queries::VisibleDiscussions < Delegator
                     (discussions.group_id IN (:user_group_ids)) OR
                     (groups.parent_members_can_see_discussions = TRUE AND groups.parent_id IN (:user_group_ids)))',
                    group_ids: group_ids,
-                   user_group_ids: user_group_ids)
+                   user_group_ids: user.group_ids)
   end
 
 end

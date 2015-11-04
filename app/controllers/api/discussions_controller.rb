@@ -46,11 +46,11 @@ class API::DiscussionsController < API::RestfulController
   private
 
   def accessible_records
-    Queries::VisibleDiscussions.new(user: current_user, groups: visible_groups)
+    Queries::VisibleDiscussions.new(user: current_user_or_visitor, groups: visible_groups)
   end
 
   def visible_groups
-    return current_user.groups unless params[:group_id] || params[:group_key]
+    return current_user_or_visitor.groups unless params[:group_id] || params[:group_key]
     load_and_authorize :group
     [@group, @group.subgroups].flatten
   end
