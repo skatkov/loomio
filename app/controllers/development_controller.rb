@@ -32,12 +32,6 @@ class DevelopmentController < ApplicationController
     redirect_to inbox_url
   end
 
-  def setup_discussions_for_visitor
-    cleanup_database
-    recent_discussion; private_discussion
-    redirect_to api_discussions_url
-  end
-
   def setup_new_group
     cleanup_database
     group = Group.new(name: 'Fresh group')
@@ -401,17 +395,6 @@ class DevelopmentController < ApplicationController
       @another_test_group.add_member! max
     end
     @another_test_group
-  end
-
-  def private_test_group
-    unless @private_test_group
-      @private_test_group = Group.create!(name: 'Amadeus',
-                                          visible_to: 'members',
-                                          description: 'Antonio Salieri, a pious court composer of Vienna, tells of his undoing of the prodigy Mozart.')
-      @private_test_group.add_admin! patrick
-      @private_test_group.add_member! max
-    end
-    @private_test_group
   end
 
   def test_discussion

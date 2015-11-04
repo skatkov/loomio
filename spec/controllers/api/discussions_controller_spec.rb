@@ -227,6 +227,20 @@ describe API::DiscussionsController do
       discussion; another_discussion
     end
 
+    context 'logged out' do
+      before { sign_out user }
+      let(:public_discussion) { create :discussion }
+      let(:private_discussion) { create :discussion, private: true }
+
+      it 'returns a list of public discussions' do
+        get :index, format: :json
+        json = JSON.parse(response.body)
+        discussion_ids = json['discussions'].map { |d| d['id'] }
+        expect(discussion_ids).to_not include private_discussion.id
+        expect(discussion_ids).to include public_discussion.id
+      end
+    end
+
     context 'success' do
       it 'returns discussions filtered by group' do
         get :index, group_id: group.id, format: :json

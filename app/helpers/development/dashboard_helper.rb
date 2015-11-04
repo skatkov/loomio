@@ -27,18 +27,14 @@ module Development::DashboardHelper
     create_discussion!(:muted_discussion) { |discussion| mute!(discussion) }
   end
 
-  def private_discussion
-    create_discussion!(:private_discussion, group: private_test_group, private: true)
-  end
-
   private
 
-  def create_discussion!(name, group: test_group, author: patrick, private: false)
+  def create_discussion!(name, group: test_group, author: patrick)
     var_name = :"@#{name}"
     if existing = instance_variable_get(var_name)
       existing
     else
-      instance_variable_set(var_name, Discussion.create!(title: name.to_s.humanize, group: group, author: author, private: private).tap do |discussion|
+      instance_variable_set(var_name, Discussion.create!(title: name.to_s.humanize, group: group, author: author, private: false).tap do |discussion|
         yield discussion if block_given?
       end)
     end
