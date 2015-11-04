@@ -38,7 +38,7 @@ class API::MotionsController < API::RestfulController
 
   private
 
-  def visible_records
+  def accessible_records
     Queries::VisibleMotions.new(user: current_user, groups: current_user.groups)
   end
 

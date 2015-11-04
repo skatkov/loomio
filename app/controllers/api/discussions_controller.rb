@@ -45,7 +45,7 @@ class API::DiscussionsController < API::RestfulController
 
   private
 
-  def visible_records
+  def accessible_records
     Queries::VisibleDiscussions.new(user: current_user, groups: visible_groups)
   end
 
