@@ -228,7 +228,7 @@ describe API::DiscussionsController do
     end
 
     context 'logged out' do
-      before { sign_out user }
+      before { @controller.stub(:current_user).and_return(LoggedOutUser.new) }
       let(:public_discussion) { create :discussion }
       let(:private_discussion) { create :discussion, private: true }
 

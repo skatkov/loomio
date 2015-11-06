@@ -4,6 +4,7 @@ class API::DiscussionsController < API::RestfulController
   include UsesDiscussionReaders
 
   def index
+    load_and_authorize(:group) if params[:group_id] || params[:group_key]
     instantiate_collection { |collection| collection.sorted_by_importance }
     respond_with_collection
   end
@@ -46,13 +47,17 @@ class API::DiscussionsController < API::RestfulController
   private
 
   def accessible_records
-    Queries::VisibleDiscussions.new(user: current_user_or_visitor, groups: visible_groups)
+    Queries::VisibleDiscussions.new(user: current_user, groups: visible_groups)
   end
 
   def visible_groups
-    return current_user_or_visitor.groups unless params[:group_id] || params[:group_key]
-    load_and_authorize :group
-    [@group, @group.subgroups].flatten
+    if @group
+      [@group, @group.subgroups].flatten
+    elsif current_user.is_logged_in?
+      current_user.groups
+    else
+      Group.visible_to_public
+    end
   end
 
   def collection_for_dashboard(collection, filter: params[:filter])

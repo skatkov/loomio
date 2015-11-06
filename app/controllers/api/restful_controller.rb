@@ -2,7 +2,6 @@ class API::RestfulController < ActionController::Base
   snorlax_used_rest!
 
   include ::ProtectedFromForgery
-  include CurrentUserHelper
 
   def create_action
     @event = service.create({resource_symbol => resource, actor: current_user})
@@ -17,6 +16,10 @@ class API::RestfulController < ActionController::Base
   end
 
   private
+
+  def current_user
+    super || LoggedOutUser.new
+  end
 
   def permitted_params
     @permitted_params ||= PermittedParams.new(params)
