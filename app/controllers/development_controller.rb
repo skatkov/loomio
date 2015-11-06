@@ -386,6 +386,18 @@ class DevelopmentController < ApplicationController
     @test_group
   end
 
+  def muted_test_group
+    unless @muted_test_group
+      @muted_test_group = Group.create!(name: 'Grosse Point Blank',
+                                        membership_granted_upon: 'approval',
+                                        is_visible_to_public: true,
+                                        is_visible_to_parent_members: false)
+      @muted_test_group.add_admin! patrick
+      Membership.find_by(group: @muted_test_group, user: patrick).set_volume! :mute
+    end
+    @muted_test_group
+  end
+
   def another_test_group
     unless @another_test_group
       @another_test_group = Group.create!(name: 'Point Break',
