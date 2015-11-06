@@ -1,6 +1,10 @@
 class API::MotionsController < API::RestfulController
   include UsesDiscussionReaders
-  load_and_authorize_resource only: [:show], find_by: :key
+
+  def show
+    load_and_authorize(:motion)
+    respond_with_resource
+  end
 
   def close
     load_and_authorize(:motion, :close)

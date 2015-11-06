@@ -6,7 +6,7 @@ class NotificationItems::MembershipRequested < NotificationItem
   end
 
   def actor
-    notification.eventable.requester || LoggedOutUser.new(name: notification.eventable.name,
+    notification.eventable.requestor || LoggedOutUser.new(name: notification.eventable.name,
                                                           email: notification.eventable.email)
   end
 

@@ -55,12 +55,12 @@ class API::MembershipsController < API::RestfulController
   private
 
   def visible_records
-    visible = resource_class.includes(:user, :group, :inviter)
-    if current_user.group_ids.any?
-      visible.where("group_id IN (#{current_user.group_ids.join(',')}) OR groups.is_visible_to_public = 't'")
-    else
-      visible.where("groups.is_visible_to_public = 't'")
-    end
+    resource_class.includes(:user, :group, :inviter)
+                  .where("group_id IN (#{current_user.group_ids.join(',')}) OR groups.is_visible_to_public = 't'")
+  end
+
+  def public_records
+    resource_class.includes(:user, :group, :inviter).where("groups.is_visible_to_public = 't'")
   end
 
   def visible_invitables
