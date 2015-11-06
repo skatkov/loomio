@@ -229,8 +229,8 @@ describe API::DiscussionsController do
 
     context 'logged out' do
       before { @controller.stub(:current_user).and_return(LoggedOutUser.new) }
-      let(:public_discussion) { create :discussion }
-      let(:private_discussion) { create :discussion, private: true }
+      let!(:public_discussion) { create :discussion, private: false }
+      let!(:private_discussion) { create :discussion, private: true }
 
       it 'returns a list of public discussions' do
         get :index, format: :json

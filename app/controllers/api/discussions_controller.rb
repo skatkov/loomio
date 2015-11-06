@@ -46,18 +46,16 @@ class API::DiscussionsController < API::RestfulController
 
   private
 
-  def accessible_records
-    Queries::VisibleDiscussions.new(user: current_user, groups: visible_groups)
+  def visible_records
+    Queries::VisibleDiscussions.new(user: current_user, groups: organisation_groups || current_user.groups)
   end
 
-  def visible_groups
-    if @group
-      [@group, @group.subgroups].flatten
-    elsif current_user.is_logged_in?
-      current_user.groups
-    else
-      Group.visible_to_public
-    end
+  def public_records
+    Queries::VisibleDiscussions.new(user: current_user, groups: organisation_groups || Group.visible_to_public)
+  end
+
+  def organisation_groups
+    [@group, @group.subgroups].flatten if @group
   end
 
   def collection_for_dashboard(collection, filter: params[:filter])
