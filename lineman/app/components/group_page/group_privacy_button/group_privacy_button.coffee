@@ -12,4 +12,4 @@ angular.module('loomioApp').directive 'groupPrivacyButton', ->
         when 'secret' then 'fa-lock'
 
     $scope.privacyDescription = ->
-      PrivacyString.group($scope.group)
+      _.capitalize(PrivacyString.group($scope.group))
