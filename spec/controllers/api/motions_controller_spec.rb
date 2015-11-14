@@ -6,6 +6,7 @@ describe API::MotionsController do
   let(:group) { create :group, is_visible_to_public: true  }
   let(:discussion) { create :discussion, group: group, private: false }
   let(:private_discussion) { create :discussion, group: group, private: true }
+  let(:private_motion) { create :motion, discussion: private_discussion }
   let(:motion) { create :motion, discussion: discussion }
   let(:another_motion) { create :motion }
   let(:motion_params) {{
@@ -35,6 +36,18 @@ describe API::MotionsController do
 
     context 'logged out' do
       before { @controller.stub(:current_user).and_return(LoggedOutUser.new) }
+
+      it 'returns a motion if it is public' do
+        get :show, id: motion.id, format: :json
+        json = JSON.parse(response.body)
+        motion_ids = json['proposals'].map { |m| m['id'] }
+        expect(motion_ids).to eq [motion.id]
+      end
+
+      it 'returns unauthorized if it is not public' do
+        get :show, id: private_motion.id, format: :json
+        expect(response.status).to eq 403
+      end
     end
   end
 
