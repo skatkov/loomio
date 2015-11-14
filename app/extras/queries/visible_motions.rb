@@ -1,6 +1,5 @@
 class Queries::VisibleMotions < Delegator
   def initialize(user: nil, groups: nil, group_ids: nil)
-    @user = user || LoggedOutUser.new
     @group_ids = group_ids.presence || Array(groups).map(&:id)
 
     @relation = Motion.joins(discussion: :group).where('groups.archived_at IS NULL').preload(:discussion)
