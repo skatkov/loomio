@@ -9,5 +9,5 @@ angular.module('loomioApp').directive 'angularFeedbackCard', ->
     $scope.version = "v#{AppConfig.version}"
     $scope.versionUrl = "http://www.github.com/loomio/loomio/releases"
 
-    $scope.$on 'hideFeedbackForm', -> $scope.hidden = true
-    $scope.$on 'showFeedbackForm', -> $scope.hidden = false
+    $scope.expand = ->   $scope.expanded = true
+    $scope.collapse = -> $scope.expanded = false

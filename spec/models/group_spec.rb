@@ -50,7 +50,20 @@ describe Group do
     end
   end
 
-  context "children counting" do
+  context "counter caches" do
+    describe 'invitations_count' do
+      before do
+        @group = create(:group)
+        @user  = create(:user)
+      end
+
+      it 'increments when a new invitation is created' do
+        InvitationService.invite_to_group(recipient_emails: [@user.email],
+                                          group: @group,
+                                          inviter: @group.creator)
+        expect(@group.invitations_count).to eq 1
+      end
+    end
 
     describe "#motions_count" do
       before do
@@ -116,20 +129,6 @@ describe Group do
         expect {
           @group.discussions.first.destroy
         }.to change { @group.reload.discussions_count }.by(-1)
-      end
-    end
-
-    describe 'invitations_count' do
-      before do
-        @group = create(:group)
-        @user  = create(:user)
-      end
-
-      it 'increments when a new invitation is created' do
-        InvitationService.invite_to_group(recipient_emails: [@user.email],
-                                          group: @group,
-                                          inviter: @group.creator)
-        expect(@group.invitations_count).to eq 1
       end
     end
   end
@@ -267,11 +266,6 @@ describe Group do
                         parent: create(:group),
                         parent_members_can_see_discussions: true) }.to_not raise_error
       end
-    end
-
-    context "both are true" do
-      it "raises error about it"
-      # dont merge before there is a spec here
     end
   end
 

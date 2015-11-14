@@ -8,6 +8,10 @@ angular.module('loomioApp').factory 'GroupModel', (BaseModel, AppConfig) ->
 
     defaultValues: ->
       parentId: null
+      groupPrivacy: 'closed'
+      isVisibleToPublic: true
+      discussionPrivacyOptions: 'private_only'
+      membershipGrantedUpon: 'approval'
 
     relationships: ->
       @hasMany 'discussions'
@@ -90,17 +94,17 @@ angular.module('loomioApp').factory 'GroupModel', (BaseModel, AppConfig) ->
     parentName: ->
       @parent().name if @parent()?
 
-    parentIsHidden: ->
-      @parent().visibleToPublic() if @parentId?
+    privacyIsOpen: ->
+      @groupPrivacy == 'open'
 
-    visibleToPublic: ->
-      @visibleTo == 'public'
+    privacyIsClosed: ->
+      @groupPrivacy == 'closed'
 
-    visibleToOrganisation: ->
-      @visibleTo == 'parent_members'
+    privacyIsSecret: ->
+      @groupPrivacy == 'secret'
 
-    visibleToMembers: ->
-      @visibleTo == 'members'
+    allowPublicDiscussions: ->
+      @discussionPrivacyOptions != 'private_only'
 
     isSubgroup: ->
       @parentId?
@@ -134,7 +138,7 @@ angular.module('loomioApp').factory 'GroupModel', (BaseModel, AppConfig) ->
       @remote.upload("#{@key}/upload_photo/#{kind}", file)
 
     trialIsOverdue: ->
-      @subscriptionKind == 'trial' && @subscriptionExpiresAt.clone().add(15, 'days') < moment()
+      @subscriptionKind == 'trial' && @subscriptionExpiresAt.clone().add(1, 'days') < moment()
 
     noInvitationsSent: ->
       @membershipsCount < 2 and @invitationsCount < 2
