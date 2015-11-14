@@ -1,7 +1,7 @@
 class Queries::VisibleDiscussions < Delegator
-  def initialize(user: nil, groups: nil, group_ids: nil)
-    @user = user
-    @group_ids = group_ids.presence || Array(groups).map(&:id)
+  def initialize(user:, groups: nil, group_ids: nil)
+    @user = user || LoggedOutUser.new
+    @group_ids = group_ids.presence || Array(groups).map(&:id).presence || user.group_ids
 
     @relation = Discussion.
                   joins(:group).
