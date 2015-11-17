@@ -10,12 +10,12 @@ class API::DiscussionsController < API::RestfulController
   end
 
   def dashboard
-    instantiate_collection { |collection| collection_for_dashboard collection }
+    instantiate_collection { |collection| collection_for_dashboard collection } if current_user.is_logged_in?
     respond_with_collection
   end
 
   def inbox
-    instantiate_collection { |collection| collection_for_inbox collection }
+    instantiate_collection { |collection| collection_for_inbox collection } if current_user.is_logged_in?
     respond_with_collection
   end
 
