@@ -26,8 +26,3 @@ angular.module('loomioApp').directive 'threadLintel', ->
 
     $scope.$on 'proposalButtonInView', (event, bool) ->
       $scope.proposalButtonInView = bool
-
-    $scope.$on 'threadPosition', (event, discussion, position) ->
-      $scope.position = position
-      $scope.discussion = discussion
-      $scope.positionPercent = (position / discussion.lastSequenceId) *100

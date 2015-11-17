@@ -8,6 +8,3 @@
         %span {{ discussion.activeProposal().name }}
     .thread-lintel__right{ng-if: '!discussion.activeProposal() && !proposalButtonInView'}
       %start_proposal_button.hidden-xs{discussion: 'discussion'}
-
-    .thread-lintel__progress-wrap.thread-lintel__progress
-      .thread-lintel__progress-bar.thread-lintel__progress{style: 'width: {{positionPercent}}%'}
