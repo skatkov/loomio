@@ -3,7 +3,7 @@ angular.module('loomioApp').directive 'navbar', ->
   restrict: 'E'
   templateUrl: 'generated/components/navbar/navbar.html'
   replace: true
-  controller: ($scope, $rootScope, Records, ThreadQueryService, AppConfig, AbilityService) ->
+  controller: ($scope, $rootScope, $window, Records, ThreadQueryService, AppConfig, AbilityService) ->
     parser = document.createElement('a')
     parser.href = AppConfig.baseUrl
 
@@ -22,3 +22,6 @@ angular.module('loomioApp').directive 'navbar', ->
 
     $scope.homePageClicked = ->
       $rootScope.$broadcast 'homePageClicked'
+
+    $scope.goToSignIn = ->
+      $window.location = '/users/sign_in'

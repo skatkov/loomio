@@ -22,8 +22,10 @@
     %section.lmo-navbar-item-container__sub.lmo-navbar-item-container__sub--left{role: 'search'}
       .lmo-navbar__item
         %navbar_search
-    %section.lmo-navbar-item-container__sub.lmo-navbar-item-container__sub--right{ng-if: 'isLoggedIn()', aria-label: "{{ 'navbar.user_actions' | translate }}"}
-      .lmo-navbar__item.lmo-navbar__item--notifications
+    %section.lmo-navbar-item-container__sub.lmo-navbar-item-container__sub--right{aria-label: "{{ 'navbar.user_actions' | translate }}"}
+      .lmo-navbar__item.lmo-navbar__item--notifications{ng-if: 'isLoggedIn()'}
         %notifications
-      .lmo-navbar__item.lmo-navbar__item--user
+      .lmo-navbar__item.lmo-navbar__item--user{ng-if: 'isLoggedIn()'}
         %navbar_user_options
+      %button.lmo-navbar__sign-up{ng-if: '!isLoggedIn()', ng-click: 'goToSignIn()'}
+        %span{translate: 'navbar.sign_in'}
