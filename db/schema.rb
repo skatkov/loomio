@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151104223007) do
+ActiveRecord::Schema.define(version: 20151118022605) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -83,6 +83,15 @@ ActiveRecord::Schema.define(version: 20151104223007) do
   end
 
   add_index "blacklisted_passwords", ["string"], name: "index_blacklisted_passwords_on_string", using: :hash
+
+  create_table "blog_stories", force: :cascade do |t|
+    t.string   "title"
+    t.string   "url"
+    t.string   "image_url"
+    t.datetime "published_at"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
 
   create_table "campaigns", force: :cascade do |t|
     t.string   "showcase_url",  limit: 255
@@ -416,7 +425,7 @@ ActiveRecord::Schema.define(version: 20151104223007) do
     t.boolean  "is_visible_to_public",                           default: true,           null: false
     t.boolean  "is_visible_to_parent_members",                   default: false,          null: false
     t.string   "discussion_privacy_options",         limit: 255,                          null: false
-    t.boolean  "members_can_add_members",                        default: false,          null: false
+    t.boolean  "members_can_add_members",                        default: true,           null: false
     t.string   "membership_granted_upon",            limit: 255,                          null: false
     t.boolean  "members_can_edit_discussions",                   default: true,           null: false
     t.boolean  "motions_can_be_edited",                          default: false,          null: false
