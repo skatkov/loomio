@@ -1,5 +1,7 @@
 require 'rails_helper'
 describe API::InvitationsController do
+  include EmailSpec::Helpers
+  include EmailSpec::Matchers
 
   let(:user) { create :user }
   let(:another_user) { create :user }
@@ -7,10 +9,6 @@ describe API::InvitationsController do
   let(:another_group) { create :group }
   let(:another_group_member) { create :user }
   let(:group) { create :group }
-  let(:user_invitable)    { { id: another_user.id, type: :user } }
-  let(:group_invitable)   { { id: another_group.id, type: :group } }
-  let(:contact_invitable) { { email: contact.email, type: :contact } }
-  let(:email_invitable)   { { email: 'mail@gmail.com', type: :email } }
   let(:pending_invitation) { create :invitation, invitable: group }
 
   before do
@@ -26,28 +24,21 @@ describe API::InvitationsController do
   describe 'create' do
     context 'success' do
 
-      it 'creates a membership invitation for a user' do
-        post :create, group_id: group.id, invitations: [user_invitable], invite_message: 'A user message', format: :json
-        expect(group.members.pluck(:id)).to include another_user.id
-      end
-      
-      it 'creates membership invitation for all members of a group' do
-        post :create, group_id: group.id, invitations: [group_invitable], invite_message: 'A group message', format: :json
-        expect(group.members.pluck(:id)).to include another_user.id
-        expect(group.members.pluck(:id)).to include another_group_member.id
-      end
-
-      it 'creates a invitation email for a contact' do
-        post :create, group_id: group.id, invitations: [contact_invitable], invite_message: 'A contact message', format: :json
-        expect(group.invitations.find_by(recipient_email: contact.email, inviter: user)).to be_present
+      it 'creates invitations with custom message', focus: true do
+        post :create, { group_id: group.id,
+                        email_addresses: 'hannah@example.com',
+                        message: 'Please make decisions with us!' }
+        json = JSON.parse(response.body)
+        invitation = json['invitations'].first
+        last_email = ActionMailer::Base.deliveries.last
+        expect(invitation['recipient_email']).to eq 'hannah@example.com'
+        expect(last_email).to have_body_text 'Please make decisions with us!'
+        expect(last_email).to deliver_to 'hannah@example.com'
       end
 
-      it 'creates an invitation email for a new email address' do
-        InvitePeopleMailer.stub_chain(:delay, :to_join_group)
-        post :create, group_id: group.id, invitations: [email_invitable], invite_message: 'An email message', format: :json
-        expect(group.invitations.find_by(recipient_email: email_invitable[:email], inviter: user)).to be_present
-      end
-
+      # test default message is present when no custom message
+      # test garbage with email addresses
+      # test multiple emails
     end
 
     # context 'failure' do

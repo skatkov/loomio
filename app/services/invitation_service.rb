@@ -1,5 +1,9 @@
 class InvitationService
 
+  def self.create_many(invitation_form:, group:, actor:)
+    # authorize and then create and send invitations
+  end
+
   def self.create_invite_to_start_group(args)
     args[:to_be_admin] = true
     args[:intent] = 'start_group'
@@ -28,11 +32,12 @@ class InvitationService
                            message: nil,
                            group: nil,
                            inviter: nil)
-    recipient_emails.each do |recipient_email|
+    recipient_emails.map do |recipient_email|
       invitation = create_invite_to_join_group(recipient_email: recipient_email,
                                                group: group,
                                                inviter: inviter)
       InvitePeopleMailer.delay.to_join_group(invitation, inviter, message)
+      invitation
     end
   end
 
