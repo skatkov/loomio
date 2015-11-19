@@ -39,6 +39,7 @@ describe API::InvitationsController do
       # test default message is present when no custom message
       # test garbage with email addresses
       # test multiple emails
+      # test limited to 100 emails
     end
 
     # context 'failure' do

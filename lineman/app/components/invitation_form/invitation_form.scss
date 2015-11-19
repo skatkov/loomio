@@ -2,3 +2,7 @@
   @include lmoBtnLink;
   color: $link-color;
 }
+
+.invitation-form__custom-message {
+  min-height: 100px;
+}
