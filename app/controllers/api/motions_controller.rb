@@ -29,8 +29,11 @@ class API::MotionsController < API::RestfulController
   end
 
   def index
-    load_and_authorize :discussion
-    instantiate_collection { |collection| collection.where(discussion: @discussion).order(:created_at) }
+    load_and_authorize(:discussion) if params[:discussion_id] || params[:discussion_key]
+    instantiate_collection do |collection|
+      collection = collection.where(discussion: @discussion) if @discussion
+      collection.order(:created_at)
+    end
     respond_with_collection
   end
 
