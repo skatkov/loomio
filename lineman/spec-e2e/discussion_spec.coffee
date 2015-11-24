@@ -8,6 +8,13 @@ describe 'Discussion Page', ->
   beforeEach ->
     threadPage.load()
 
+  describe 'viewing while logged out', ->
+    it 'should display content for a public thread', ->
+      groupsHelper.loadPath('view_open_group_as_visitor')
+      groupsHelper.clickFirstThread()
+      expect(threadPage.discussionTitle()).toContain('I carried a watermelon')
+      expect(threadPage.signInButton()).toContain('Sign In')
+
   describe 'edit thread', ->
     it 'lets you edit title and context', ->
       threadPage.openEditThreadForm()
