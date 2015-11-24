@@ -8,6 +8,8 @@
     %select.invitation-form__group-select.form-control#group-select{ng-model: 'group', ng-required: true, ng-options: 'group as group.fullName for group in availableGroups() | orderBy: "fullName"'}
     %label{for: 'email-addresses', translate: 'invitation_form.email_addresses'}
     %textarea.invitation-form__email-addresses.form-control#email-addresses{ng-model: 'form.emailAddresses', ng-required: true, msd-elastic: 'true', rows: 1, placeholder: '{{ "invitation_form.email_addresses_placeholder" | translate }}' }
+    .invitation-form__no-invitations.lmo-validation-error{ng-show: 'noInvitations', translate: 'invitation_form.messages.no_invitations'}
+    .invitation-form__max-invitations.lmo-validation-error{ng-show: 'maxInvitations()', translate: 'invitation_form.messages.max_invitations'}
     %p{ng-if: '!showCustomMessageField'}
       %span{translate: 'invitation_form.add_custom_message'}>
       %button.invitation-form__add-custom-message-link.lmo-btn-link{translate: 'invitation_form.add_custom_message_link', ng-click: 'addCustomMessage()'}>

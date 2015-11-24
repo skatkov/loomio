@@ -2,7 +2,7 @@ class API::InvitationsController < API::RestfulController
 
   def create
     load_and_authorize :group, :invite_people
-    @invitations = InvitationService.invite_to_group(recipient_emails: params[:email_addresses].scan(/[^\s<,]+?@[^>,\s]+/),
+    @invitations = InvitationService.invite_to_group(recipient_emails: params[:email_addresses].scan(/[^\s<,]+?@[^>,\s]+/).take(100),
                                                      group: @group,
                                                      inviter: current_user,
                                                      message: params[:message])

@@ -24,22 +24,27 @@ describe API::InvitationsController do
   describe 'create' do
     context 'success' do
 
-      it 'creates invitations with custom message', focus: true do
+      it 'creates invitations with custom message' do
+        ActionMailer::Base.deliveries = []
         post :create, { group_id: group.id,
-                        email_addresses: 'hannah@example.com',
+                        email_addresses: 'rob@example.com, hannah@example.com',
                         message: 'Please make decisions with us!' }
         json = JSON.parse(response.body)
-        invitation = json['invitations'].first
+        invitation = json['invitations'].last
         last_email = ActionMailer::Base.deliveries.last
+        expect(ActionMailer::Base.deliveries.size).to eq 2
         expect(invitation['recipient_email']).to eq 'hannah@example.com'
         expect(last_email).to have_body_text 'Please make decisions with us!'
         expect(last_email).to deliver_to 'hannah@example.com'
       end
 
-      # test default message is present when no custom message
-      # test garbage with email addresses
-      # test multiple emails
-      # test limited to 100 emails
+      it 'includes default message when no custom message' do
+        post :create, { group_id: group.id,
+                        email_addresses: 'rob@example.com, hannah@example.com' }
+        json = JSON.parse(response.body)
+        last_email = ActionMailer::Base.deliveries.last
+        expect(last_email).to have_body_text "Click the link to join #{group.name} and get started:"
+      end
     end
 
     # context 'failure' do

@@ -591,10 +591,10 @@ en:
     custom_message_placeholder: 'Enter a personal message to include with the invitation.'
     send: 'Send'
     messages:
-      members_added_and_emails_sent: '{{members}} member(s) added and {{emails}} invitation(s) sent'
-      members_added: '{{members}} member(s) added'
-      emails_sent: '{{emails}} invitation(s) sent'
-      no_invitations: 'No invitation(s) sent!'
+      invitation_sent: 'Invitation sent.'
+      invitations_sent: '{{count}} invitations sent.'
+      no_invitations: 'Uh-oh! Please verify the email address is correct and try again.'
+      max_invitations: 'If you want to send more than 100 invitations, use a team link.'
   memberships_page:
     members: 'Members'
     name_label: 'Name'
