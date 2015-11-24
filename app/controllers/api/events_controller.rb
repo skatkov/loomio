@@ -5,7 +5,7 @@ class API::EventsController < API::RestfulController
 
   def accessible_records
     load_and_authorize :discussion
-    @discussion.items.sequenced
+    @discussion.items.includes(eventable: [:likers, :parent]).sequenced
   end
 
   def page_collection(collection)
