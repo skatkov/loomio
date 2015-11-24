@@ -29,11 +29,8 @@ class API::MotionsController < API::RestfulController
   end
 
   def index
-    load_and_authorize :discussion if params[:discussion_id] || params[:discussion_key]
-    instantiate_collection do |collection|
-      collection = collection.where(discussion: @discussion) if @discussion
-      collection.order(:created_at)
-    end
+    load_and_authorize :discussion
+    instantiate_collection { |collection| collection.where(discussion: @discussion).order(:created_at) }
     respond_with_collection
   end
 
@@ -45,12 +42,8 @@ class API::MotionsController < API::RestfulController
 
   private
 
-  def visible_records
+  def accessible_records
     Queries::VisibleMotions.new(user: current_user, groups: current_user.groups)
-  end
-
-  def public_records
-    Queries::VisibleMotions.new(user: current_user, groups: Group.visible_to_public)
   end
 
   def serializer_root
