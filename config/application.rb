@@ -86,7 +86,7 @@ module Loomio
     config.paperclip_defaults = {
       storage: :fog,
       fog_credentials: fog_credentials,
-      fog_directory: Rails.application.secrets.fog_directory,
+      fog_directory: Rails.application.secrets.fog_uploads_directory,
       fog_public: true
     }
   end
