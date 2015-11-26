@@ -107,7 +107,7 @@ describe API::MembershipsController do
         group.add_member!(jim_emrob)
         another_group.add_member!(rob_othergroup)
       end
-      it 'returns users filtered by query', focus: true do
+      it 'returns users filtered by query' do
         get :autocomplete, group_id: group.id, q: 'rob', format: :json
 
         user_ids = JSON.parse(response.body)['users'].map{|c| c['id']}

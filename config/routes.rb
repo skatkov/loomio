@@ -337,7 +337,7 @@ Loomio::Application.routes.draw do
 
   get '/localisation/:locale' => 'localisation#show', format: 'js'
 
-  resources :users, path: 'u', only: [:new] do
+  resources :users, path: 'u', only: [] do
     member do
       put :set_avatar_kind
       post :upload_new_avatar

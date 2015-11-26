@@ -1,0 +1,13 @@
+.team-link-modal__caution {
+  font-size: 13px;
+  color: #767676;
+}
+
+.team-link-modal__close-button {
+  float: left;
+  @include lmoBtnDefault;
+}
+
+.team-link-modal__copy-button {
+  @include lmoBtnPrimary;
+}

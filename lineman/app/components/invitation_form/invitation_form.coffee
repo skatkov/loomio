@@ -1,6 +1,6 @@
 angular.module('loomioApp').factory 'InvitationForm', ->
   templateUrl: 'generated/components/invitation_form/invitation_form.html'
-  controller: ($scope, group, CurrentUser, AbilityService, FlashService, RestfulClient) ->
+  controller: ($scope, group, CurrentUser, AbilityService, FlashService, RestfulClient, ModalService, TeamLinkModal) ->
     $scope.group = group
     $scope.form = { emailAddresses: '' }
     $scope.showCustomMessageField = false
@@ -20,6 +20,9 @@ angular.module('loomioApp').factory 'InvitationForm', ->
 
     $scope.maxInvitations = ->
       $scope.form.emailAddresses.split(' ').length > 100
+
+    $scope.getTeamLink = ->
+      ModalService.open TeamLinkModal, group: -> group
 
     $scope.submit = ->
       $scope.isDisabled = true

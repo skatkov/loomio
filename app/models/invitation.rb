@@ -9,7 +9,6 @@ class Invitation < ActiveRecord::Base
   extend FriendlyId
   friendly_id :token
   belongs_to :inviter, class_name: User
-  belongs_to :accepted_by, class_name: User
   belongs_to :invitable, polymorphic: true
   belongs_to :canceller, class_name: User
 
@@ -81,10 +80,6 @@ class Invitation < ActiveRecord::Base
 
   def to_join_group?
     intent == 'join_group'
-  end
-
-  def to_join_discussion?
-    intent == 'join_discussion'
   end
 
   private

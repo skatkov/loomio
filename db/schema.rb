@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151118022605) do
+ActiveRecord::Schema.define(version: 20151126005440) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -274,6 +274,13 @@ ActiveRecord::Schema.define(version: 20151118022605) do
   add_index "discussions", ["last_activity_at"], name: "index_discussions_on_last_activity_at", order: {"last_activity_at"=>:desc}, using: :btree
   add_index "discussions", ["private"], name: "index_discussions_on_private", using: :btree
 
+  create_table "drafts", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "draftable_id"
+    t.string  "draftable_type"
+    t.json    "payload",        default: {}, null: false
+  end
+
   create_table "events", force: :cascade do |t|
     t.string   "kind",           limit: 255
     t.datetime "created_at"
@@ -461,7 +468,6 @@ ActiveRecord::Schema.define(version: 20151118022605) do
     t.integer  "inviter_id",                                  null: false
     t.boolean  "to_be_admin",                 default: false, null: false
     t.string   "token",           limit: 255,                 null: false
-    t.integer  "accepted_by_id"
     t.datetime "accepted_at"
     t.string   "intent",          limit: 255
     t.integer  "canceller_id"
@@ -471,6 +477,7 @@ ActiveRecord::Schema.define(version: 20151118022605) do
     t.string   "invitable_type",  limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "single_use",                  default: true,  null: false
   end
 
   add_index "invitations", ["created_at"], name: "index_invitations_on_created_at", using: :btree

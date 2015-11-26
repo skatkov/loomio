@@ -16,6 +16,8 @@
     .blank{ng-if: 'showCustomMessageField'}
       %label{for: 'custom-message', translate: 'invitation_form.custom_message'}
       %textarea.invitation-form__custom-message.form-control#custom-message{ng-model: 'form.message', msd-elastic: 'true', placeholder: '{{ "invitation_form.custom_message_placeholder" | translate }}'}
+    %span{translate: 'invitation_form.team_invitation_message'}>
+    %button.invitation-form__get-team-link.lmo-btn-link{translate: 'invitation_form.team_invitation_link', ng-click: 'getTeamLink()'}>
 
   .modal-footer
     %button.invitation-form__submit.lmo-btn--submit{ng-click: 'submit()', ng-disabled: 'isDisabled', translate: 'invitation_form.send', translate-value-count: '{{invitationsCount()}}'}

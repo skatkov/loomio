@@ -1,0 +1,14 @@
+.team-link-modal
+  .modal-header
+    %modal_header_cancel_button
+    %h1.lmo-h1.modal-title{translate: 'team_link_modal.heading'}
+
+  .modal-body
+    %label{translate: 'team_link_modal.share_link'}
+    %p
+      %input.team-link-modal__shareable-link
+      %button.team-link-modal__copy-button{type: 'button', translate: 'team_link_modal.copy_link'}
+    .team-link-modal__caution{translate: 'team_link_modal.caution'}
+
+  .modal-footer.lmo-clearfix
+    %button.team-link-modal__close-button{type: 'button', ng-click: '$close()', translate: 'team_link_modal.close'}
