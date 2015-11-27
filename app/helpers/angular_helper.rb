@@ -45,6 +45,6 @@ module AngularHelper
   end
 
   def use_angular_ui?
-    current_user_or_visitor.angular_ui_enabled?
+    current_user_or_visitor.angular_ui_enabled? && request.format == :html
   end
 end
