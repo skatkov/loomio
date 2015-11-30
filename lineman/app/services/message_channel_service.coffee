@@ -10,9 +10,6 @@ angular.module('loomioApp').factory 'MessageChannelService', ($http, $rootScope,
     subscribeToDiscussion: (discussion) ->
       @subscribe { discussion_key: discussion.key }
 
-    subscribeToUser: ->
-      $http.post('/api/v1/message_channel/subscribe_user').then handleSubscriptions
-
     handleSubscriptions = (subscriptions) ->
       _.each subscriptions.data, (subscription) ->
         PrivatePub.sign(subscription)
