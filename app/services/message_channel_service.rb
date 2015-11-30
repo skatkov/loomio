@@ -13,7 +13,7 @@ class MessageChannelService
     if ENV['DELAY_FAYE']
       PrivatePub.delay(priority: 10).publish_to(to.message_channel, data)
     else
-      PrivatePub.publish_to(channel, data)
+      PrivatePub.publish_to(to.message_channel, data)
     end
   end
 end
