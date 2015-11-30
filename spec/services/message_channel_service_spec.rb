@@ -30,6 +30,11 @@ describe MessageChannelService do
       expect(MessageChannelService.subscribe_to(user: user, model: discussion))
     end
 
+    it 'subscribes users to the global channel' do
+      expect(PrivatePub).to receive(:subscription).with(channel: "/global", server: Rails.application.secrets.faye_url)
+      MessageChannelService.subscribe_to(user: user, model: GlobalMessageChannel.instance)
+    end
+
     it 'does not allow users to subscribe to things they cant see' do
       expect { MessageChannelService.subscribe_to(user: user, model: another_user) }.to raise_error { MessageChannelService::AccessDeniedError }
       expect { MessageChannelService.subscribe_to(user: user, model: another_group) }.to raise_error { MessageChannelService::AccessDeniedError }
@@ -41,45 +46,35 @@ describe MessageChannelService do
     end
   end
 
-  describe 'channel_for' do
-    it 'returns correctly for the specified types' do
-      expect(MessageChannelService.channel_for(group)).to eq "/group-#{group.key}"
-      expect(MessageChannelService.channel_for(discussion)).to eq "/discussion-#{discussion.key}"
-      expect(MessageChannelService.channel_for(user)).to eq "/user-#{user.key}"
-    end
-
-    it 'does not blow up on nil' do
-      expect(MessageChannelService.channel_for(nil)).to eq nil
-    end
-
-    it 'returns nil for classes without a channel' do
-      expect(MessageChannelService.channel_for(motion)).to eq nil
-    end
-  end
-
   describe 'publish' do
-    before do
-      expect(Rails.application.secrets).to receive(:faye_url).and_return('fayeurl')
-    end
 
     it 'publishes data to a user model' do
+      expect(Rails.application.secrets).to receive(:faye_url).and_return('fayeurl')
       expect(PrivatePub).to receive(:publish_to).with("/user-#{user.key}", data)
       MessageChannelService.publish(data, to: user)
     end
 
     it 'publishes data to a discussion model' do
+      expect(Rails.application.secrets).to receive(:faye_url).and_return('fayeurl')
       expect(PrivatePub).to receive(:publish_to).with("/discussion-#{discussion.key}", data)
       MessageChannelService.publish(data, to: discussion)
     end
 
     it 'publishes data to a group model' do
+      expect(Rails.application.secrets).to receive(:faye_url).and_return('fayeurl')
       expect(PrivatePub).to receive(:publish_to).with("/group-#{group.key}", data)
       MessageChannelService.publish(data, to: group)
     end
 
+    it 'publishes data to the global channel' do
+      expect(Rails.application.secrets).to receive(:faye_url).and_return('fayeurl')
+      expect(PrivatePub).to receive(:publish_to).with("/global", data)
+      MessageChannelService.publish(data, to: GlobalMessageChannel.instance)
+    end
+
     it 'does not publish data to an invalid model' do
       expect(PrivatePub).not_to receive(:publish_to)
-      MessageChannelService.publish(data, to: motion)
+      expect { MessageChannelService.publish(data, to: motion) }.to raise_error { MessageChannelService::UnknownChannelError }
     end
   end
 end
