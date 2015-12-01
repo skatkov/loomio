@@ -1,8 +1,3 @@
-.invitation-form__add-custom-message-link, .invitation-form__get-team-link {
-  @include lmoBtnLink;
-  color: $link-color;
-}
-
 .invitation-form__custom-message {
   min-height: 100px;
 }

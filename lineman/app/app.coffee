@@ -10,6 +10,8 @@ angular.module('loomioApp', ['ngNewRouter',
                              'ui.gravatar',
                              'truncate',
                              'duScroll',
+                             'angular-clipboard',
+                             'checklist-model',
                              'monospaced.elastic']).config ($httpProvider, $locationProvider, $translateProvider, markedProvider, $compileProvider, $animateProvider) ->
 
   # this should make stuff faster but you need to add "animated" class to animated things.

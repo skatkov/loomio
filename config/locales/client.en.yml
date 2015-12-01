@@ -27,7 +27,9 @@ en:
     more_help: 'More help'
     models:
       proposal: 'Proposal'
+    copied: 'Copied'
     action:
+      close: 'Close'
       save: 'Save'
       save_changes: 'Save changes'
       update_settings: 'Update settings'
@@ -590,7 +592,9 @@ en:
     custom_message: 'Custom message'
     custom_message_placeholder: 'Enter a personal message to include with the invitation.'
     team_invitation_message: 'Alternatively, '
-    team_invitation_link:  'get a link to share'
+    team_invitation_link:  'get a link to share.'
+    add_members: 'Add members'
+    from_parent_group: 'from {{name}}.'
     send: 'Send'
     messages:
       invitation_sent: 'Invitation sent.'
@@ -603,7 +607,9 @@ en:
     share_link: 'Share this link'
     caution: 'Caution: anyone who has this link will be able to join your group immediately. Be careful who you share it with :)'
     copy_link: 'Copy link'
-    close: 'Close'
+
+  add_members_modal:
+    heading: 'Add people from {{name}}'
 
   memberships_page:
     members: 'Members'

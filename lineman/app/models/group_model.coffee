@@ -32,6 +32,9 @@ angular.module('loomioApp').factory 'GroupModel', (BaseModel, AppConfig) ->
       @hasMany 'subgroups', from: 'groups', with: 'parentId', of: 'id'
       @belongsTo 'parent', from: 'groups'
 
+    shareableInvitation: ->
+      @recordStore.invitations.find(singleUse:false, groupId: @id)[0]
+
     closedProposals: ->
       _.filter @proposals(), (proposal) ->
         proposal.isClosed()
@@ -59,7 +62,7 @@ angular.module('loomioApp').factory 'GroupModel', (BaseModel, AppConfig) ->
 
     pendingInvitations: ->
       _.filter @invitations(), (invitation) ->
-        invitation.isPending()
+        invitation.isPending() and invitation.singleUse
 
     hasPendingInvitations: ->
       _.some @pendingInvitations()

@@ -1,12 +1,15 @@
 angular.module('loomioApp').factory 'InvitationForm', ->
   templateUrl: 'generated/components/invitation_form/invitation_form.html'
-  controller: ($scope, group, CurrentUser, AbilityService, FlashService, RestfulClient, ModalService, TeamLinkModal) ->
+  controller: ($scope, group, CurrentUser, AbilityService, FlashService, RestfulClient, ModalService, TeamLinkModal, AddMembersModal) ->
     $scope.group = group
     $scope.form = { emailAddresses: '' }
     $scope.showCustomMessageField = false
     $scope.isDisabled = false
     $scope.noInvitations = false
     remote = new RestfulClient('invitations')
+
+    $scope.addMembers = ->
+      ModalService.open AddMembersModal, group: -> group
 
     $scope.addCustomMessage = ->
       $scope.showCustomMessageField = true

@@ -55,6 +55,24 @@ describe API::InvitationsController do
     # end
   end
 
+  describe 'shareable' do
+    context 'permitted' do
+      it 'gives a shareable link for the group' do
+        get :shareable, group_id: group.id
+        json = JSON.parse(response.body)
+        expect(json['invitations'].first['single_use']).to eq false
+      end
+    end
+
+    context 'not permitted' do
+      it 'gives access denied' do
+        sign_in another_user
+        get :shareable, group_id: group.id
+        expect(response.status).to eq 403
+      end
+    end
+  end
+
   describe 'pending' do
     context 'permitted' do
       it 'returns invitations filtered by group' do
@@ -67,10 +85,8 @@ describe API::InvitationsController do
 
     context 'not permitted' do
       it 'returns AccessDenied' do
-        sign_out user
         sign_in another_user
         get :pending, group_id: group.id
-        expect(JSON.parse(response.body)['exception']).to eq 'CanCan::AccessDenied'
         expect(response.status).to eq 403
       end
     end

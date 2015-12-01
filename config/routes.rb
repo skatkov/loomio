@@ -70,6 +70,7 @@ Loomio::Application.routes.draw do
 
     resources :invitations, only: [:create, :destroy] do
       get :pending, on: :collection
+      get :shareable, on: :collection
     end
 
     resources :profile, only: [:show] do

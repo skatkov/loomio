@@ -21,7 +21,9 @@ class Invitation < ActiveRecord::Base
   before_save :ensure_token_is_present
 
   scope :not_cancelled,  -> { where(cancelled_at: nil) }
-  scope :pending, -> { not_cancelled.where(accepted_at: nil) }
+  scope :pending, -> { not_cancelled.single_use.where(accepted_at: nil) }
+  scope :shareable, -> { not_cancelled.where(single_use: false) }
+  scope :single_use, -> { not_cancelled.where(single_use: true) }
 
 
   def recipient_first_name

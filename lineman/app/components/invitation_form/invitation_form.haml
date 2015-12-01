@@ -12,12 +12,16 @@
     .invitation-form__max-invitations.lmo-validation-error{ng-show: 'maxInvitations()', translate: 'invitation_form.messages.max_invitations'}
     %p{ng-if: '!showCustomMessageField'}
       %span{translate: 'invitation_form.add_custom_message'}>
-      %button.invitation-form__add-custom-message-link.lmo-btn-link{translate: 'invitation_form.add_custom_message_link', ng-click: 'addCustomMessage()'}>
+      %button.invitation-form__add-custom-message-link.lmo-btn-link--blue{translate: 'invitation_form.add_custom_message_link', ng-click: 'addCustomMessage()'}>
     .blank{ng-if: 'showCustomMessageField'}
       %label{for: 'custom-message', translate: 'invitation_form.custom_message'}
       %textarea.invitation-form__custom-message.form-control#custom-message{ng-model: 'form.message', msd-elastic: 'true', placeholder: '{{ "invitation_form.custom_message_placeholder" | translate }}'}
-    %span{translate: 'invitation_form.team_invitation_message'}>
-    %button.invitation-form__get-team-link.lmo-btn-link{translate: 'invitation_form.team_invitation_link', ng-click: 'getTeamLink()'}>
+    %p
+      %span{translate: 'invitation_form.team_invitation_message'}>
+      %button.invitation-form__get-team-link.lmo-btn-link--blue{translate: 'invitation_form.team_invitation_link', ng-click: 'getTeamLink()'}>
+    %p
+      %button.invitation-form__add-members.lmo-btn-link--blue{translate: 'invitation_form.add_members', ng-click: 'addMembers()'}>
+      %span{translate: 'invitation_form.from_parent_group', translate-values:'{name: group.parentName()}'}
 
   .modal-footer
     %button.invitation-form__submit.lmo-btn--submit{ng-click: 'submit()', ng-disabled: 'isDisabled', translate: 'invitation_form.send', translate-value-count: '{{invitationsCount()}}'}

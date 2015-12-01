@@ -34,6 +34,15 @@ class InvitationService
     invitation.cancel!(canceller: actor)
   end
 
+  def self.shareable_invitation_for(group)
+    if group.invitations.shareable.count == 0
+      Invitation.create!(single_use: false,
+                         intent: 'join_group',
+                         invitable: group)
+    end
+    group.invitations.shareable.first
+  end
+
   def self.redeem(invitation, user)
     if invitation.cancelled?
       raise Invitation::InvitationCancelled
