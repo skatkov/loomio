@@ -16,26 +16,31 @@ describe MessageChannelService do
 
   describe 'subscribe_to' do
     it 'allows users to subscribe to themselves' do
+      expect(Rails.application.secrets).to receive(:faye_url).and_return('fayeurl').at_least(:once)
       expect(PrivatePub).to receive(:subscription).with(channel: "/user-#{user.key}", server: Rails.application.secrets.faye_url)
-      expect(MessageChannelService.subscribe_to(user: user, model: user))
+      MessageChannelService.subscribe_to(user: user, model: user)
     end
 
     it 'allows users to subscribe to a group' do
+      expect(Rails.application.secrets).to receive(:faye_url).and_return('fayeurl').at_least(:once)
       expect(PrivatePub).to receive(:subscription).with(channel: "/group-#{group.key}", server: Rails.application.secrets.faye_url)
-      expect(MessageChannelService.subscribe_to(user: user, model: group))
+      MessageChannelService.subscribe_to(user: user, model: group)
     end
 
     it 'allows users to subscribe to a discussion' do
+      expect(Rails.application.secrets).to receive(:faye_url).and_return('fayeurl').at_least(:once)
       expect(PrivatePub).to receive(:subscription).with(channel: "/discussion-#{discussion.key}", server: Rails.application.secrets.faye_url)
-      expect(MessageChannelService.subscribe_to(user: user, model: discussion))
+      MessageChannelService.subscribe_to(user: user, model: discussion)
     end
 
     it 'subscribes users to the global channel' do
+      expect(Rails.application.secrets).to receive(:faye_url).and_return('fayeurl').at_least(:once)
       expect(PrivatePub).to receive(:subscription).with(channel: "/global", server: Rails.application.secrets.faye_url)
       MessageChannelService.subscribe_to(user: user, model: GlobalMessageChannel.instance)
     end
 
     it 'does not allow users to subscribe to things they cant see' do
+      expect(Rails.application.secrets).to receive(:faye_url).and_return('fayeurl').at_least(:once)
       expect { MessageChannelService.subscribe_to(user: user, model: another_user) }.to raise_error { MessageChannelService::AccessDeniedError }
       expect { MessageChannelService.subscribe_to(user: user, model: another_group) }.to raise_error { MessageChannelService::AccessDeniedError }
       expect { MessageChannelService.subscribe_to(user: user, model: another_discussion) }.to raise_error { MessageChannelService::AccessDeniedError }
