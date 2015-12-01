@@ -18,6 +18,7 @@ class MessageChannelService
   end
 
   def self.ensure_valid_channel(model)
+    return unless model
     raise UnknownChannelError.new unless model.respond_to?(:message_channel)
     Rails.application.secrets.faye_url.present?
   end
