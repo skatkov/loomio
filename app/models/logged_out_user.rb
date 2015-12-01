@@ -21,7 +21,7 @@ class LoggedOutUser
   TRUE_METHODS.each  { |method| define_method(method, -> { true }) }
 
   def angular_ui_enabled
-    true
+    false
   end
   alias :angular_ui_enabled? :angular_ui_enabled
 
