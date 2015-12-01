@@ -1023,5 +1023,5 @@ en:
 
   global:
     messages:
-      app_update: 'Loomio has been updated!'
-      get_the_latest: 'Get the latest'
+      app_update: 'A new version of Loomio is available'
+      reload: 'Reload'

@@ -15,7 +15,7 @@ angular.module('loomioApp').factory 'MessageChannelService', ($http, $rootScope,
         PrivatePub.sign(subscription)
         PrivatePub.subscribe subscription.channel, (data) ->
           if data.version?
-            FlashService.update 'global.messages.app_update', {version: data.version}, 'global.messages.get_the_latest', ->
+            FlashService.update 'global.messages.app_update', {version: data.version}, 'global.messages.reload', ->
               $window.location.reload()
 
           if data.memo?
