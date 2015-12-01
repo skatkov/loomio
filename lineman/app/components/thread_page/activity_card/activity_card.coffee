@@ -3,7 +3,7 @@ angular.module('loomioApp').directive 'activityCard', ->
   restrict: 'E'
   templateUrl: 'generated/components/thread_page/activity_card/activity_card.html'
   replace: true
-  controller: ($scope, $rootScope, $location, $document, $timeout, Records, AppConfig, LoadingService, AbilityService) ->
+  controller: ($scope, $rootScope, $location, $document, $timeout, Records, AppConfig, LoadingService) ->
 
     $scope.pageSize = 30
     $scope.firstLoadedSequenceId = 0
@@ -13,7 +13,7 @@ angular.module('loomioApp').directive 'activityCard', ->
     visibleSequenceIds = []
 
     $scope.init = ->
-      $scope.discussion.markAsRead(0) if AbilityService.isLoggedIn()
+      $scope.discussion.markAsRead(0)
 
       $scope.loadEventsForwards(
         commentId: $location.search().comment
@@ -46,7 +46,7 @@ angular.module('loomioApp').directive 'activityCard', ->
 
     $scope.threadItemVisible = (item) ->
       addSequenceId(item.sequenceId)
-      $scope.discussion.markAsRead(item.sequenceId) if AbilityService.isLoggedIn()
+      $scope.discussion.markAsRead(item.sequenceId)
       $scope.loadEventsForwards(sequenceId: $scope.lastLoadedSequenceId) if $scope.loadMoreAfterReading(item)
 
     $scope.loadEvents = ({from, per, commentId}) ->
