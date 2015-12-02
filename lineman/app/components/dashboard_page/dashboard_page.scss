@@ -1,6 +1,5 @@
 .dashboard-page {
-  max-width: $main-max-width;
-  margin: 0px auto;
+  @include lmoRow;
 }
 
 .dashboard-page__heading{
@@ -9,6 +8,10 @@
 
 .dashboard-page__options{
   margin-bottom: 16px;
+}
+
+.dashboard-page__filter-dropdown{
+  float: right;
 }
 
 .dashboard-page__date-range{
@@ -31,7 +34,7 @@
 
 .dashboard-page__group-name a{
   @include fontHelveticaMedium;
-  @include fontCrapName;
+  @include fontMedium;
   line-height: 30px;
   color: $grey-on-grey;
   margin-left: 16px;

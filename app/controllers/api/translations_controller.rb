@@ -4,13 +4,15 @@ class API::TranslationsController < API::RestfulController
   rescue_from(TranslationUnavailableError) { |e| respond_with_standard_error e, 400 }
 
   def show
-    locale = params[:lang]
+    render json: translations_for(:en, params[:lang])
+  end
 
-    source = YAML.load_file("config/locales/client.#{locale}.yml")[locale]
-    fallback = YAML.load_file('config/locales/client.en.yml')['en']
+  private
 
-    dest = fallback.deep_merge(source)
-    render json: dest
+  def translations_for(*locales)
+    locales.map(&:to_s).uniq.reduce({}) do |translations, locale|
+      translations.deep_merge YAML.load_file("config/locales/client.#{locale}.yml")[locale]
+    end
   end
 
   def inline

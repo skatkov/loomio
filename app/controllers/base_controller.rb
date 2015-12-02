@@ -1,6 +1,7 @@
 class BaseController < ApplicationController
   include AutodetectTimeZone
   include OmniauthAuthenticationHelper
+  include AngularHelper
 
   before_filter :authenticate_user!
 
@@ -13,17 +14,8 @@ class BaseController < ApplicationController
   before_filter :boot_angular_ui, if: :use_angular_ui?
 
   helper_method :time_zone
-  #helper_method :permitted_params
 
   protected
-
-  def boot_angular_ui
-    render 'layouts/angular', layout: false
-  end
-
-  def use_angular_ui?
-    current_user_or_visitor.angular_ui_enabled?
-  end
 
   def ajax_request?
     request.xhr? or not user_signed_in?

@@ -1,12 +1,8 @@
-%article.thread-item{ng-controller: 'NewProposalItemController', aria-labelledby: 'proposal-{{proposal.id}}'}
+.thread-item
   .thread-item__header.media
     .media-left
-      .thread-item__proposal-icon
+      %user_avatar{user: "event.actor()", size: 'small'}
     .media-body
-      %h3.thread-item__header{id: 'proposal-{{proposal.id}}', translate: "new_proposal_item.author_created_proposal", translate-value-name: '{{proposal.authorName()}}'}
-  .thread-item__body
-    {{proposal.name}}
-
-  .thread-item__footer
-    .thread-item__actions
-      %timeago{timestamp: 'proposal.createdAt'}
+      %h3.thread-item__title{id: 'event-{{event.id}}'}
+        %span{translate: "new_proposal_item.author_created_proposal", translate-values: '{actor: event.actorName(), title: event.proposal().name}'}
+        %timeago.timeago--inline{timestamp: 'event.createdAt'}

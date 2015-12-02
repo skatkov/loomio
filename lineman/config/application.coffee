@@ -13,7 +13,7 @@ module.exports = require(process.env["LINEMAN_MAIN"]).config.extend "application
       enabled: true
       port: 3000
 
-  loadNpmTasks: ["grunt-angular-templates", "grunt-concat-sourcemap", "grunt-ng-annotate", "grunt-haml", 'grunt-sass', 'grunt-cucumber', 'grunt-contrib-copy', 'grunt-exec']
+  loadNpmTasks: ["grunt-angular-templates", "grunt-concat-sourcemap", "grunt-ng-annotate", "grunt-haml", 'grunt-sass', 'grunt-contrib-copy', 'grunt-exec']
 
   removeTasks:
     #dist: ['uglify']
@@ -63,16 +63,13 @@ module.exports = require(process.env["LINEMAN_MAIN"]).config.extend "application
 
   exec:
     updateScss:
-      command: 'ruby print_scss_includes.rb > modules.scss'
-      cwd: 'app/css'
+      command: 'ruby css/print_scss_includes.rb > ./components.scss'
+      cwd: 'app/'
 
   sass:
     dist:
       files:
         'generated/css/main.css': 'app/css/main.scss'
-
-    options:
-      includePaths: ['vendor/bower_components/']
 
   ngtemplates:
     loomioApp:
@@ -137,7 +134,7 @@ module.exports = require(process.env["LINEMAN_MAIN"]).config.extend "application
       tasks: ["coffee", "concat_sourcemap:spec"]
 
     sass:
-      files: ["<%= files.sass.vendor %>", "<%= files.sass.app %>"]
+      files: ["<%= files.sass.vendor %>", "<%= files.sass.app %>", "<%= files.sass.main %>"]
       tasks: ["exec:updateScss", "sass", "concat_sourcemap:css"]
 
     webfonts:

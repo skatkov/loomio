@@ -1,12 +1,9 @@
 class SearchResultSerializer < ActiveModel::Serializer
-  attributes :priority, :query
+  embed :id, include: true
+  attributes :id, :key, :description, :result_group_name, :title, :last_activity_at, :rank, :query, :blurb
 
-  has_one  :discussion, serializer: SearchResults::DiscussionSerializer
-  has_many :proposals,  serializer: SearchResults::MotionSerializer
-  has_many :comments,   serializer: SearchResults::CommentSerializer
-
-  def proposals
-    object.motions
+  def id
+    SecureRandom.hex(8)
   end
 
 end

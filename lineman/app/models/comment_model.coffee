@@ -1,9 +1,10 @@
-angular.module('loomioApp').factory 'CommentModel', (BaseModel, AppConfig) ->
-  class CommentModel extends BaseModel
+angular.module('loomioApp').factory 'CommentModel', (DraftableModel, AppConfig) ->
+  class CommentModel extends DraftableModel
     @singular: 'comment'
     @plural: 'comments'
     @indices: ['discussionId', 'authorId']
     @serializableAttributes: AppConfig.permittedParams.comment
+    @draftParent: 'discussion'
 
     defaultValues: ->
       usesMarkdown: true
@@ -29,6 +30,9 @@ angular.module('loomioApp').factory 'CommentModel', (BaseModel, AppConfig) ->
 
     isReply: ->
       @parentId?
+
+    parent: ->
+      @recordStore.comments.find(@parentId)
 
     likers: ->
       @recordStore.users.find(@likerIds)
@@ -56,3 +60,9 @@ angular.module('loomioApp').factory 'CommentModel', (BaseModel, AppConfig) ->
 
     removeLikerId: (id) ->
       @likerIds = _.without(@likerIds, id)
+
+    cookedBody: ->
+      cooked = @body
+      _.each @mentionedUsernames, (username) ->
+        cooked = cooked.replace(///@#{username}///g, "[[@#{username}]]")
+      cooked

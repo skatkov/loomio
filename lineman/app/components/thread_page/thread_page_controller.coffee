@@ -1,11 +1,10 @@
-angular.module('loomioApp').controller 'ThreadPageController', ($scope, $routeParams, $location, $rootScope, Records, MessageChannelService, ModalService, DiscussionForm, ScrollService, AbilityService) ->
+angular.module('loomioApp').controller 'ThreadPageController', ($scope, $routeParams, $location, $rootScope, Records, MessageChannelService, ModalService, DiscussionForm, MoveThreadForm, DeleteThreadForm, ScrollService, AbilityService, CurrentUser, ChangeThreadVolumeForm) ->
   $rootScope.$broadcast('currentComponent', { page: 'threadPage'})
 
-  handleCommentHash = (->
+  handleCommentHash = do ->
     if match = $location.hash().match /comment-(\d+)/
       $location.search().comment = match[1]
       $location.hash('')
-  )()
 
   @performScroll = ->
     ScrollService.scrollTo @elementToFocus(), 150
@@ -33,8 +32,6 @@ angular.module('loomioApp').controller 'ThreadPageController', ($scope, $routePa
   @init = (discussion) =>
     if discussion and !@discussion?
       @discussion = discussion
-      @group      = @discussion.group()
-      @comment    = Records.comments.build(discussionId: @discussion.id)
       if @discussion.hasActiveProposal() and $location.search().proposal == @discussion.activeProposal().key
         @proposalToFocus = @discussion.activeProposal()
 
@@ -45,7 +42,7 @@ angular.module('loomioApp').controller 'ThreadPageController', ($scope, $routePa
       $rootScope.$broadcast 'setTitle', @discussion.title
       $rootScope.$broadcast 'analyticsSetGroup', @discussion.group()
 
-      MessageChannelService.subscribeTo "/discussion-#{@discussion.key}"
+      MessageChannelService.subscribeToDiscussion(@discussion)
 
   @init Records.discussions.find $routeParams.key
   Records.discussions.findOrFetchById($routeParams.key).then @init, (error) ->
@@ -53,27 +50,49 @@ angular.module('loomioApp').controller 'ThreadPageController', ($scope, $routePa
 
   $scope.$on 'threadPageEventsLoaded',    (event) =>
     @eventsLoaded = true
-    @commentToFocus = Records.comments.find parseInt($location.search().comment)
+    commentId = parseInt($location.search().comment)
+    @commentToFocus = Records.comments.find(commentId) unless isNaN(commentId)
     @performScroll() if @proposalsLoaded or !@discussion.anyClosedProposals()
   $scope.$on 'threadPageProposalsLoaded', (event) =>
     @proposalsLoaded = true
     @proposalToFocus = Records.proposals.find $location.search().proposal
     @performScroll() if @eventsLoaded
 
+  @group = ->
+    @discussion.group()
+
   @showLintel = (bool) ->
     $rootScope.$broadcast('showThreadLintel', bool)
 
-  @editDiscussion = ->
+  @editThread = ->
     ModalService.open DiscussionForm, discussion: => @discussion
 
+  @moveThread = ->
+    ModalService.open MoveThreadForm, discussion: => @discussion
+
+  @deleteThread = ->
+    ModalService.open DeleteThreadForm, discussion: => @discussion
+
   @showContextMenu = =>
-    @canEditDiscussion(@discussion)
+    @canEditThread(@discussion)
 
   @canStartProposal = ->
     AbilityService.canStartProposal(@discussion)
 
-  @canEditDiscussion = =>
+  @openChangeVolumeForm = ->
+    ModalService.open ChangeThreadVolumeForm, thread: => @discussion
+
+  @canChangeVolume = ->
+    CurrentUser.isMemberOf(@discussion.group())
+
+  @canEditThread = =>
     AbilityService.canEditThread(@discussion)
+
+  @canMoveThread = =>
+    AbilityService.canMoveThread(@discussion)
+
+  @canDeleteThread = =>
+    AbilityService.canDeleteThread(@discussion)
 
   @proposalInView = ($inview) ->
     $rootScope.$broadcast 'proposalInView', $inview

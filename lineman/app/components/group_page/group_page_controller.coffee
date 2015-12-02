@@ -1,26 +1,49 @@
-angular.module('loomioApp').controller 'GroupPageController', ($rootScope, $routeParams, Records, CurrentUser, ScrollService, ModalService, MessageChannelService, GroupWelcomeModal, AbilityService) ->
+angular.module('loomioApp').controller 'GroupPageController', ($rootScope, $location, $routeParams, Records, CurrentUser, MessageChannelService, AbilityService, AppConfig, ModalService, SubscriptionSuccessModal, GroupWelcomeModal) ->
   $rootScope.$broadcast 'currentComponent', {page: 'groupPage'}
-
-  $rootScope.$on 'newGroupCreated', ->
-    ModalService.open GroupWelcomeModal
 
   Records.groups.findOrFetchById($routeParams.key).then (group) =>
     @group = group
     $rootScope.$broadcast 'currentComponent', { page: 'groupPage' }
     $rootScope.$broadcast 'viewingGroup', @group
-    $rootScope.$broadcast 'setTitle', @group.fullName()
+    $rootScope.$broadcast 'setTitle', @group.fullName
     $rootScope.$broadcast 'analyticsSetGroup', @group
-    MessageChannelService.subscribeTo("/group-#{@group.key}")
+    $rootScope.$broadcast 'trialIsOverdue', @group if @group.trialIsOverdue()
+    MessageChannelService.subscribeToGroup(@group)
+    @handleSubscriptionSuccess()
+    @handleWelcomeModal()
   , (error) ->
     $rootScope.$broadcast('pageError', error)
-
-  @isMember = ->
-    CurrentUser.membershipFor(@group)?
 
   @showDescriptionPlaceholder = ->
     AbilityService.canAdministerGroup(@group) and !@group.description
 
   @canManageMembershipRequests = ->
     AbilityService.canManageMembershipRequests(@group)
+
+  @canUploadPhotos = ->
+    AbilityService.canAdministerGroup(@group)
+
+  @openUploadCoverForm = ->
+    ModalService.open CoverPhotoForm, group: => @group
+
+  @openUploadLogoForm = ->
+    ModalService.open LogoPhotoForm, group: => @group
+
+  @handleSubscriptionSuccess = ->
+    if (AppConfig.chargify or AppConfig.environment == 'development') and $location.search().chargify_success?
+      @group.subscriptionKind = 'paid' # incase the webhook is slow
+      $location.search 'chargify_success', null
+      ModalService.open SubscriptionSuccessModal
+
+  @showWelcomeModel = ->
+    AbilityService.isCreatorOf(@group) and
+    @group.noInvitationsSent() and
+    !@group.trialIsOverdue() and
+    !GroupWelcomeModal.shownToGroup[@group.id]
+
+  @handleWelcomeModal = =>
+    if @showWelcomeModel()
+      GroupWelcomeModal.shownToGroup[@group.id] = true
+      ModalService.open GroupWelcomeModal
 
   return

@@ -19,8 +19,12 @@ Webhooks::Slack::Base = Struct.new(:event) do
       title:       attachment_title,
       text:        attachment_text,
       fields:      attachment_fields,
-      fallback:    attachment_fallback
+      fallback:    attachment_fallback,
+      color:       attachment_color
     }]
+  end
+
+  def attachment_color
   end
 
   alias :read_attribute_for_serialization :send
@@ -29,7 +33,7 @@ Webhooks::Slack::Base = Struct.new(:event) do
 
   def motion_vote_field
     {
-      title: "Vote on this proposal",
+      title: "Have your say",
       value: "#{proposal_link(eventable, "yes")} · " +
              "#{proposal_link(eventable, "abstain")} · " +
              "#{proposal_link(eventable, "no")} · " +
@@ -45,16 +49,32 @@ Webhooks::Slack::Base = Struct.new(:event) do
     { value: discussion_link(I18n.t(:"webhooks.slack.view_it_on_loomio"), params) }
   end
 
-  def proposal_link(proposal, position = nil)
-    discussion_link position || proposal.name, { proposal: proposal.key, position: position }
+  def proposal_link(model, position = nil)
+    discussion_link position_text_for(position) || proposal_name(model), { proposal: model.key, position: position }
   end
 
   def discussion_link(text = nil, params = {})
     "<#{discussion_url(eventable.discussion, params)}|#{text || eventable.discussion.title}>"
   end
 
+  def position_text_for(position)
+    case position
+    when 'yes' then 'agree'
+    when 'abstain' then 'abstain'
+    when 'no' then 'no'
+    when 'block' then 'block'
+    end
+  end
+
   def eventable
     @eventable ||= event.eventable
+  end
+
+  def proposal_name(model)
+    case model
+    when Motion then model.name
+    when Vote then model.motion_name
+    end
   end
 
   def author

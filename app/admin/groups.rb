@@ -79,9 +79,15 @@ ActiveAdmin.register Group do
   show do |group|
     attributes_table do
       row :group_request
+      row :standard_plan_link do link_to("standard subscription link", ChargifyService.standard_plan_url(group), target: '_blank' ) end
+      row :plus_plan_link do link_to("plus subscription link", ChargifyService.plus_plan_url(group), target: '_blank') end
       group.attributes.each do |k,v|
         row k, v.inspect
       end
+    end
+
+    panel('Subscription links') do
+      table
     end
 
     panel("Group Admins") do
@@ -150,6 +156,10 @@ ActiveAdmin.register Group do
       f.input :category_id, as: :select, collection: Category.all
     end
     f.actions
+  end
+
+  collection_action :massey_data, method: :get do
+    render json: Group.visible_to_public.pluck(:id, :parent_id, :name, :description)
   end
 
   member_action :archive, :method => :post do

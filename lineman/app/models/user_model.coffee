@@ -29,6 +29,10 @@ angular.module('loomioApp').factory 'UserModel', (BaseModel, AppConfig) ->
     parentGroups: ->
       _.filter @groups(), (group) -> group.parentId == null
 
+    orphanSubgroups: ->
+      _.filter @groups(), (group) =>
+        group.isSubgroup() and !@isMemberOf(group.parent())
+
     isAuthorOf: (object) ->
       @id == object.authorId
 
@@ -37,3 +41,9 @@ angular.module('loomioApp').factory 'UserModel', (BaseModel, AppConfig) ->
 
     isMemberOf: (group) ->
       _.contains(group.memberIds(), @id)
+
+    firstName: ->
+      @name.split(' ')[0]
+
+    lastName: ->
+      @name.split(' ').slice(1).join(' ')

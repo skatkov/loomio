@@ -312,6 +312,11 @@ en:
   #
 
   start_group_form:
+    enable_angular:
+      header: New groups start in Loomio 1.0
+      subtitle: "To start a new group, you'll need to switch to the brand new version of Loomio:"
+      switch_to_angular: Start a group in the new Loomio
+      helptext: "We've rebuilt Loomio from the ground up. You can read about what's new <a href=\"/angular\">here</a>.<br/>You'll be able to switch back to the old version any time you like."
     header: "Start a new group"
     form_error: "Some information is missing or incorrect."
     name: "Your name"
@@ -319,8 +324,10 @@ en:
     email: "Your email"
     email_error: "Not a valid email address."
     group_name: "Group name"
+    group_description: "Group description"
+    group_description_placeholder: "Describe the purpose of your group so your group members know why they are here."
     group_name_error: "Group name is required"
-    pricing_html: "In 30 days, when you've seen how Loomio improves your group's decision-making, we'll ask you to choose the <a href='%{link}' target='_blank'>payment plan</a> that works for you."
+    pricing_html: "In 30 days, we'll ask you to choose a <a href='%{link}' target='_blank'>pricing plan</a>."
     terms_html: "By starting a group, you agree to Loomio's <a href='%{link}' target='_blank'>terms of service</a>."
     success:
       header: "You're almost done! Check your email."
@@ -844,15 +851,28 @@ en:
     vote: 'You can change your position at any time'
 
   pricing_page:
-    header: 'Pricing'
-    social_mission_html: "Our pricing model is driven by our social mission: <strong>making it easy for anyone, anywhere to participate in decisions that affect them</strong>."
-    loomio_for_organisations: "Loomio for organisations"
-    organisations_deal_html: "If you're using Loomio in a company, formal organisation or workplace, you'll be charged a monthly subscription of US$1 per person after a <strong>30-day free trial</strong>."
-    discuss_options_html: "If you'd like to discuss pricing options to suit your organisation, <a href=/contact#contact-form target='_blank'>contact us</a>."
-    loomio_for_communities: "Loomio for communities"
-    communities_deal: "Money will never be a barrier for people using Loomio to do great stuff in their communities. If your group doesn't have the budget to pay for software, you don't need to pay a subscription. However, we will occasionally ask your group members for a voluntary donation."
+    header: Pricing
+    gift: Gift
+    standard: Standard
+    plus: Plus
+    free_trial_html: "We'll ask you to choose your pricing plan after a <span>30-day free trial</span>. No credit card required."
+    get_started_for_free: "Get started for free"
+    gift_body_html: |
+      <p>For groups that don't have the budget to pay a subscription.</p>
+      <p>Donation supported, with no requirement to pay.</p>
 
-
+    gift_donation_ask: We'll ask your group members for a donation.
+    unlimited_members: unlimited members
+    unlimited_decisions: unlimited decisions
+    email_support: email support
+    standard_price_html: |
+      US <strong>$19</strong>/month<br><span>or</span> $190/year
+    plus_body: 'Everything in Standard, plus:'
+    premium_support: premium support
+    custom_url: custom URL
+    usage_statistics: usage statistics
+    plus_price_html: |
+      US <strong>$179</strong>/month<br><span>or</span> $1790/year
   #
   # CONTRIBUTIONS
   #
@@ -910,8 +930,6 @@ en:
   or: "or"
   invalid_email: The email address you entered was not recognised. Verify it is entered correctly or try another email address.
   forgot_your_password: "Forgot your password?"
-  dont_have_an_account: "Don't have an account?"
-  create_one_now: "Create one now"
   link_it_up_instead: "Link it up instead"
   sign_up_via: "Sign up via"
   or_fill_in_this_form: "or fill in this form"
@@ -947,6 +965,7 @@ en:
   #
 
   invitation:
+    angular_warning_html: '<small> Anyone that accepts your invitation will use the new Loomio interface: <a href="http://blog.loomio.org/2015/10/14/one-step-closer-to-loomio-1-0/" target="_blank">find out more</a>.</small>'
     alternate: "Alternatively, share this link and anyone can ask to join:"
     by_email: "Invite by email"
     invitation_not_found:  'Could not find invitation with that token. Please ask for a new invitation from the sender.'
@@ -967,7 +986,8 @@ en:
     invites_more_help2: "<p>You can invite people to your group at any time.</p><p>You might want to invite all your members in right away, or you could start by inviting just the people you’re working most closely with.</p>"
     invitation_link: "Invitation link"
     discussion_link: "Participate in the discussion:"
-    link_help: "Click this link to join %{group} on Loomio:"
+    link_help: "Click the link to join %{group_name} and get started:"
+    thanks: "Thanks,"
     copy: "If someone did not get their invitation email, please feel free to copy the invitation link above and give it to the recipient yourself."
     pending_invitations: 'Pending invitations'
     no_pending_invitations: "There are currently no pending invitations."
@@ -990,21 +1010,54 @@ en:
   # EXAMPLE CONTENT
   #
 
-  example_discussion:
-    title: "Example Discussion: Welcome and introduction to Loomio"
+  introduction_thread:
+    title: "Welcome to %{group_name}"
     description: |
-      Welcome to Loomio, a new tool for group decision-making.
-      By engaging on a topic, discussing various perspectives and information, and addressing any concerns that arise, your group can put their heads together to find the best way forward.
-      You can use this example discussion to play around with the features of the tool.
-      To get the ball rolling, Loomio Helper Bot thinks it would be a great idea for your group to take a holiday together. The pie graph on the right shows how your group feels about the proposal. You can have your say by clicking on one of the decision buttons underneath.
+      Please take a moment to introduce yourself: **post a comment** in the form below.
 
-  example_motion:
-    name: "We should have a holiday on the moon!"
+      If you have clear intentions for this Loomio group, you could share them here so everyone has an idea of what they want to achieve together.
+
+  how_it_works_thread:
+    title: How To Use Loomio
     description: |
-      Loomio Helper Bot is really keen for your group to invest in a trip to the moon. Apparently the space-cheese is delicious. But the implications for your carbon footprint are worrying.
-      Is it a good idea? Loomio Helper Bot wants to know what you think!
-      If you’re clear about your position, click one of the icons below (hover over the decision buttons for a description of what each one means).
-      You’ll be prompted to make a short statement about the reason for your decision. This makes it easy to see a summary of what everyone thinks and why. You can change your mind and edit your decision freely until the proposal closes.
+      Welcome to Loomio, an online place to make decisions together.
+
+      This is an example discussion **thread**. Why not use this space to try out Loomio’s features?
+
+      You are currently reading the thread **context**. Use this space to give the background information the group needs for a productive discussion.
+
+      The **proposal** panel is where you make decisions. You can start proposals and participate in them there.
+
+      The **activity** panel below shows everything that’s happened in this thread.
+
+  first_comment:
+    body: |
+      Hi folks, I’m the Loomio Helper Bot.
+
+      If you want to get the attention of a specific person in your group, type @ into the comment field, followed by their name :)
+
+      Here are some things you might want to try to get things under way:
+
+      - Set your [profile picture](/profile)
+      - Configure your [email settings](/email_preferences)
+      - Introduce yourself to the group in the [Welcome to %{group_name} thread](%{thread_url})
+
+      If you’ve got any questions, the first place to check is the [Loomio help manual](http://help.loomio.org).
+
+  first_proposal:
+    name: 'Demonstration proposal: let’s go!'
+    description: |
+      This the proposal **description**. Here you can explain the proposed course of action and give enough detail so that everyone can make a well informed decision.
+
+      To participate in the proposal, choose one of these options:
+
+      - **Agree**: “I agree with this and want it to go ahead.”
+      - **Abstain**: “I am happy for the group to decide without me.”
+      - **Disagree**: “I think we can probably do better.”
+      - **Block**: “I have strong objections to this proposal and am not OK with it going ahead.”
+
+      When you have chosen, you’ll be prompted for a short statement to explain why you feel the way you do. You can change your position at any time while the proposal is still open.
+
   #
   # CONTACT PAGE
   #
@@ -1314,6 +1367,7 @@ en:
   unlike: "Unlike"
   time_until_close: "%{quantity_of_time} until close"
   update: "Update"
+  username: "Username"
   facebook: "Facebook"
   yahoo: "Yahoo"
   google: "Google"
@@ -1331,7 +1385,6 @@ en:
 
   common:
     profile: "Profile"
-    welcome_back: "Welcome back!"
     email_settings: "Email settings"
     markdown_help_tooltip: 'Learn the basics of formatting your text with Markdown'
     settings: Settings
@@ -1450,8 +1503,16 @@ en:
 
   webhooks:
     slack:
+      motion_closed: "*%{name}* has closed"
       motion_closing_soon: "*%{name}* has a proposal closing in 24 hours"
       motion_outcome_created: "*%{author}* published an outcome in *%{name}*"
       motion_outcome_updated: "*%{author}* updated the outcome for *%{name}*"
       new_motion: "*%{author}* started a new proposal in *%{name}*"
+      new_vote: "*%{author}* %{position} *%{proposal}* in *%{name}*"
+      new_discussion: "*%{author}* started a new discussion in *%{group}*"
       view_it_on_loomio: "View it on Loomio"
+      position_verbs:
+        "yes": "agreed on"
+        "no": "disagreed on"
+        abstain: "abstained on"
+        block: "blocked"

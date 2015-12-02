@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150814133815) do
+ActiveRecord::Schema.define(version: 20151118174946) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,12 +66,16 @@ ActiveRecord::Schema.define(version: 20150814133815) do
 
   create_table "attachments", force: :cascade do |t|
     t.integer  "user_id"
-    t.string   "filename",   limit: 255
+    t.string   "filename",          limit: 255
     t.text     "location"
     t.integer  "comment_id"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.integer  "filesize"
+    t.string   "file_file_name"
+    t.string   "file_content_type"
+    t.integer  "file_file_size"
+    t.datetime "file_updated_at"
   end
 
   add_index "attachments", ["comment_id"], name: "index_attachments_on_comment_id", using: :btree
@@ -83,6 +87,15 @@ ActiveRecord::Schema.define(version: 20150814133815) do
   end
 
   add_index "blacklisted_passwords", ["string"], name: "index_blacklisted_passwords_on_string", using: :hash
+
+  create_table "blog_stories", force: :cascade do |t|
+    t.string   "title"
+    t.string   "url"
+    t.string   "image_url"
+    t.datetime "published_at"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
 
   create_table "campaigns", force: :cascade do |t|
     t.string   "showcase_url",  limit: 255
@@ -166,6 +179,15 @@ ActiveRecord::Schema.define(version: 20150814133815) do
 
   add_index "contacts", ["user_id"], name: "index_contacts_on_user_id", using: :btree
 
+  create_table "default_group_covers", force: :cascade do |t|
+    t.string   "cover_photo_file_name"
+    t.string   "cover_photo_content_type"
+    t.integer  "cover_photo_file_size"
+    t.datetime "cover_photo_updated_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer  "priority",               default: 0
     t.integer  "attempts",               default: 0
@@ -211,6 +233,7 @@ ActiveRecord::Schema.define(version: 20150814133815) do
   add_index "discussion_readers", ["participating"], name: "index_discussion_readers_on_participating", using: :btree
   add_index "discussion_readers", ["starred"], name: "index_discussion_readers_on_starred", using: :btree
   add_index "discussion_readers", ["user_id", "discussion_id"], name: "index_discussion_readers_on_user_id_and_discussion_id", unique: true, using: :btree
+  add_index "discussion_readers", ["user_id", "volume"], name: "index_discussion_readers_on_user_id_and_volume", using: :btree
   add_index "discussion_readers", ["user_id"], name: "index_motion_read_logs_on_user_id", using: :btree
   add_index "discussion_readers", ["volume"], name: "index_discussion_readers_on_volume", using: :btree
 
@@ -249,10 +272,18 @@ ActiveRecord::Schema.define(version: 20150814133815) do
   add_index "discussions", ["author_id"], name: "index_discussions_on_author_id", using: :btree
   add_index "discussions", ["created_at"], name: "index_discussions_on_created_at", using: :btree
   add_index "discussions", ["group_id"], name: "index_discussions_on_group_id", using: :btree
-  add_index "discussions", ["is_deleted", "group_id"], name: "index_discussions_on_is_deleted_and_group_id", using: :btree
-  add_index "discussions", ["is_deleted", "id"], name: "index_discussions_on_is_deleted_and_id", using: :btree
+  add_index "discussions", ["is_deleted", "archived_at"], name: "index_discussions_on_is_deleted_and_archived_at", using: :btree
   add_index "discussions", ["is_deleted"], name: "index_discussions_on_is_deleted", using: :btree
   add_index "discussions", ["key"], name: "index_discussions_on_key", unique: true, using: :btree
+  add_index "discussions", ["last_activity_at"], name: "index_discussions_on_last_activity_at", order: {"last_activity_at"=>:desc}, using: :btree
+  add_index "discussions", ["private"], name: "index_discussions_on_private", using: :btree
+
+  create_table "drafts", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "draftable_id"
+    t.string  "draftable_type"
+    t.json    "payload",        default: {}, null: false
+  end
 
   create_table "events", force: :cascade do |t|
     t.string   "kind",           limit: 255
@@ -371,7 +402,6 @@ ActiveRecord::Schema.define(version: 20150814133815) do
     t.string   "name",                               limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "members_invitable_by",               limit: 255
     t.integer  "parent_id"
     t.boolean  "hide_members",                                   default: false
     t.text     "description"
@@ -395,10 +425,10 @@ ActiveRecord::Schema.define(version: 20150814133815) do
     t.text     "enabled_beta_features"
     t.string   "subdomain",                          limit: 255
     t.integer  "theme_id"
-    t.boolean  "is_visible_to_public",                           default: false,          null: false
+    t.boolean  "is_visible_to_public",                           default: true,           null: false
     t.boolean  "is_visible_to_parent_members",                   default: false,          null: false
     t.string   "discussion_privacy_options",         limit: 255,                          null: false
-    t.boolean  "members_can_add_members",                        default: false,          null: false
+    t.boolean  "members_can_add_members",                        default: true,           null: false
     t.string   "membership_granted_upon",            limit: 255,                          null: false
     t.boolean  "members_can_edit_discussions",                   default: true,           null: false
     t.boolean  "motions_can_be_edited",                          default: false,          null: false
@@ -414,22 +444,28 @@ ActiveRecord::Schema.define(version: 20150814133815) do
     t.boolean  "members_can_raise_motions",                      default: true,           null: false
     t.boolean  "members_can_vote",                               default: true,           null: false
     t.boolean  "members_can_start_discussions",                  default: true,           null: false
-    t.boolean  "members_can_create_subgroups",                   default: true,           null: false
+    t.boolean  "members_can_create_subgroups",                   default: false,          null: false
     t.integer  "creator_id"
     t.boolean  "is_commercial"
     t.boolean  "is_referral",                                    default: false,          null: false
     t.integer  "cohort_id"
+    t.integer  "default_group_cover_id"
+    t.integer  "subscription_id"
+    t.integer  "motions_count",                                  default: 0,              null: false
+    t.integer  "invitations_count",                              default: 0,              null: false
+    t.integer  "admin_memberships_count",                        default: 0,              null: false
   end
 
-  add_index "groups", ["archived_at", "id"], name: "index_groups_on_archived_at_and_id", using: :btree
   add_index "groups", ["category_id"], name: "index_groups_on_category_id", using: :btree
   add_index "groups", ["cohort_id"], name: "index_groups_on_cohort_id", using: :btree
   add_index "groups", ["created_at"], name: "index_groups_on_created_at", using: :btree
+  add_index "groups", ["default_group_cover_id"], name: "index_groups_on_default_group_cover_id", using: :btree
   add_index "groups", ["full_name"], name: "index_groups_on_full_name", using: :btree
   add_index "groups", ["is_visible_to_public"], name: "index_groups_on_is_visible_to_public", using: :btree
   add_index "groups", ["key"], name: "index_groups_on_key", unique: true, using: :btree
   add_index "groups", ["name"], name: "index_groups_on_name", using: :btree
   add_index "groups", ["parent_id"], name: "index_groups_on_parent_id", using: :btree
+  add_index "groups", ["parent_members_can_see_discussions"], name: "index_groups_on_parent_members_can_see_discussions", using: :btree
 
   create_table "invitations", force: :cascade do |t|
     t.string   "recipient_email", limit: 255,                 null: false
@@ -490,7 +526,9 @@ ActiveRecord::Schema.define(version: 20150814133815) do
   add_index "memberships", ["group_id", "user_id", "is_suspended", "archived_at"], name: "active_memberships", using: :btree
   add_index "memberships", ["group_id"], name: "index_memberships_on_group_id", using: :btree
   add_index "memberships", ["inviter_id"], name: "index_memberships_on_inviter_id", using: :btree
+  add_index "memberships", ["user_id", "volume"], name: "index_memberships_on_user_id_and_volume", using: :btree
   add_index "memberships", ["user_id"], name: "index_memberships_on_user_id", using: :btree
+  add_index "memberships", ["volume"], name: "index_memberships_on_volume", using: :btree
 
   create_table "motion_readers", force: :cascade do |t|
     t.integer  "motion_id"
@@ -527,6 +565,8 @@ ActiveRecord::Schema.define(version: 20150814133815) do
   end
 
   add_index "motions", ["author_id"], name: "index_motions_on_author_id", using: :btree
+  add_index "motions", ["closed_at"], name: "index_motions_on_closed_at", using: :btree
+  add_index "motions", ["closing_at"], name: "index_motions_on_closing_at", using: :btree
   add_index "motions", ["created_at"], name: "index_motions_on_created_at", using: :btree
   add_index "motions", ["discussion_id", "closed_at"], name: "index_motions_on_discussion_id_and_closed_at", order: {"closed_at"=>:desc}, using: :btree
   add_index "motions", ["discussion_id"], name: "index_motions_on_discussion_id", using: :btree
@@ -584,7 +624,7 @@ ActiveRecord::Schema.define(version: 20150814133815) do
     t.boolean  "viewed",     default: false, null: false
   end
 
-  add_index "notifications", ["event_id", "user_id"], name: "index_notifications_on_event_id_and_user_id", using: :btree
+  add_index "notifications", ["created_at"], name: "index_notifications_on_created_at", order: {"created_at"=>:desc}, using: :btree
   add_index "notifications", ["event_id"], name: "index_notifications_on_event_id", using: :btree
   add_index "notifications", ["user_id"], name: "index_notifications_on_user_id", using: :btree
   add_index "notifications", ["viewed"], name: "index_notifications_on_viewed", using: :btree
@@ -618,14 +658,15 @@ ActiveRecord::Schema.define(version: 20150814133815) do
   add_index "organisation_visits", ["visit_id", "organisation_id"], name: "index_organisation_visits_on_visit_id_and_organisation_id", unique: true, using: :btree
 
   create_table "subscriptions", force: :cascade do |t|
-    t.integer  "group_id"
-    t.decimal  "amount",                 precision: 8, scale: 2
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.string   "profile_id", limit: 255
+    t.string  "kind"
+    t.date    "expires_at"
+    t.date    "trial_ended_at"
+    t.date    "activated_at"
+    t.integer "chargify_subscription_id"
+    t.string  "plan"
   end
 
-  add_index "subscriptions", ["group_id"], name: "index_subscriptions_on_group_id", using: :btree
+  add_index "subscriptions", ["kind"], name: "index_subscriptions_on_kind", using: :btree
 
   create_table "themes", force: :cascade do |t|
     t.text     "style"
@@ -696,7 +737,7 @@ ActiveRecord::Schema.define(version: 20150814133815) do
     t.boolean  "email_missed_yesterday",                       default: true,       null: false
     t.string   "email_api_key",                    limit: 255
     t.boolean  "email_when_mentioned",                         default: true,       null: false
-    t.boolean  "angular_ui_enabled",                           default: false,      null: false
+    t.boolean  "angular_ui_enabled",                           default: true,       null: false
     t.boolean  "email_on_participation",                       default: true,       null: false
   end
 
@@ -708,12 +749,13 @@ ActiveRecord::Schema.define(version: 20150814133815) do
   add_index "users", ["username"], name: "index_users_on_username", unique: true, using: :btree
 
   create_table "versions", force: :cascade do |t|
-    t.string   "item_type",  limit: 255, null: false
-    t.integer  "item_id",                null: false
-    t.string   "event",      limit: 255, null: false
-    t.string   "whodunnit",  limit: 255
+    t.string   "item_type",      limit: 255, null: false
+    t.integer  "item_id",                    null: false
+    t.string   "event",          limit: 255, null: false
+    t.string   "whodunnit",      limit: 255
     t.text     "object"
     t.datetime "created_at"
+    t.jsonb    "object_changes"
   end
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree

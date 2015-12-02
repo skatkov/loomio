@@ -4,6 +4,11 @@ class VoteService
     return false unless vote.valid?
     actor.ability.authorize! :create, vote
     vote.save!
-    Events::NewVote.publish!(vote)
+
+    Draft.purge(user: actor, draftable: vote.motion, field: :vote)
+
+    event = Events::NewVote.publish!(vote)
+    DiscussionReader.for(discussion: vote.motion.discussion, user: actor).author_thread_item!(vote.created_at)
+    event
   end
 end

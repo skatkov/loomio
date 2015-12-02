@@ -376,7 +376,6 @@ ga-IE:
     vote: Tig leat do sheasamh a athrú am ar bith
   pricing_page:
     header: Praghsáil
-    loomio_for_organisations: Loomio i gcomhair eagraíochtaí
   contribution:
     making_a_donation: Bronn airgead
   new_password: Focal faire nua
@@ -414,8 +413,6 @@ ga-IE:
     empty_search: Cuardach folamh
     please_enter_a_search: Cuir aon cheist sa bharra cuardach thuas
     no_match: Ní raibh aon torthaí beachta ar do cheist
-  example_motion:
-    name: "Ba chóir dúinn saoire a ghlacadh ar an ngealach!"
   contact_page:
     contact_us: Déan teagmháil linn
     contact_form: An fhoirm teagmhála

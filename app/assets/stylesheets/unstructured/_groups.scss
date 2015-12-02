@@ -93,6 +93,9 @@ body.groups {
     .group-description{
       margin: 16px 0 5px 0;
       width: 100%;
+      img {
+        width: 100%;
+      }
     }
     .logo-placeholder {
       float: left;
@@ -201,7 +204,7 @@ body.groups {
 }
 
 .group-link-name{
-  font-weight: bold; 
+  font-weight: bold;
   margin-top: 0.3em;
 }
 .sub-group .group-link-name {
@@ -294,5 +297,10 @@ body.start_group {
     line-height: 32px;
     font-weight: 300;
   }
-  .pricing { margin: 15px 0 30px; }
+  form textarea, form textarea.form-control { height: 100px; }
+  .pricing {
+    font-size: 22px;
+    text-align: right;
+    font-weight: 300;
+  }
 }

@@ -1,6 +1,13 @@
 class API::DiscussionsController < API::RestfulController
-  load_and_authorize_resource only: [:show, :mark_as_read]
+  load_and_authorize_resource only: [:show, :mark_as_read, :move]
   load_resource only: [:create, :update, :star, :unstar, :set_volume]
+  include UsesDiscussionReaders
+
+  def index
+    load_and_authorize(:group, optional: true)
+    instantiate_collection { |collection| collection.sorted_by_importance }
+    respond_with_collection
+  end
 
   def dashboard
     instantiate_collection { |collection| collection_for_dashboard collection }
@@ -10,6 +17,11 @@ class API::DiscussionsController < API::RestfulController
   def inbox
     instantiate_collection { |collection| collection_for_inbox collection }
     respond_with_collection
+  end
+
+  def move
+    service.move discussion: resource, params: params, actor: current_user
+    respond_with_resource
   end
 
   def mark_as_read
@@ -34,19 +46,8 @@ class API::DiscussionsController < API::RestfulController
 
   private
 
-  def respond_with_collection(**args)
-    args[:scope] ||= {}
-    args[:scope][:reader_cache] = DiscussionReaderCache.new(user: current_user, discussions: collection)
-    super args
-  end
-
-  def visible_records
-    Queries::VisibleDiscussions.new(user: current_user, groups: visible_groups)
-  end
-
-  def visible_groups
-    load_and_authorize :group if params[:group_id] || params[:group_key]
-    Array(@group).presence || current_user.groups
+  def accessible_records
+    Queries::VisibleDiscussions.new(user: current_user, group_ids: @group && @group.id_and_subgroup_ids)
   end
 
   def collection_for_dashboard(collection, filter: params[:filter])

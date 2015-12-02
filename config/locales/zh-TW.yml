@@ -46,6 +46,8 @@ zh-TW:
         subject: 有人邀請您加入他們的 Loomio 群組
     registrations:
       sign_up: 建立帳號
+    sessions:
+      signed_out: 登出成功
   error:
     access_denied: 您沒有足夠的權限。
     cant_join_subgroup: 假如您不是父群組的成員，您就不能加入子群組。
@@ -262,6 +264,11 @@ zh-TW:
       group_contributions: 您在群組中作出的意見、提案與討論串會留下，但我們會從中移除您的大名。
       emails: 我們會停止寄送給您有關 Loomio 的電子郵件。
   start_group_form:
+    enable_angular:
+      header: 在 Loomio 1.0 中啟動的新群組
+      subtitle: 要啟動一個新群組，您將會需要切換到全新版本的 Loomio：
+      switch_to_angular: 在新的 Loomio 中啟動群組
+      helptext: "我們已從頭開始重建 Loomio。您可以 <a href=\"/angular\">在這裡</a> 閱讀有什麼新東西。<br/>您可以在任何時候切換回舊版的 Loomio。"
     header: 啟動新的群組
     form_error: 有一些資訊遺失或不正確。
     name: 您的大名
@@ -269,8 +276,10 @@ zh-TW:
     email: 您的電子郵件
     email_error: 並非有效的電子郵件地址。
     group_name: 群組名稱
+    group_description: 群組描述
+    group_description_placeholder: 描述群組的目的讓您的夥伴們知道他們為什麼在這裡。
     group_name_error: 群組名稱必填
-    pricing_html: "在 30 天內，當您發現 Loomio 可以為您的團隊在作決策上帶來超棒的改進時，我們將會問您是否要選擇適合您的 <a href='%{link}' target='_blank'>付費方案</a>。"
+    pricing_html: "在 30 天內，我們將會詢問您要選取哪一個 <a href='%{link}' target='_blank'>定價方案</a>。"
     terms_html: "要開始一個群組，您即同意遵守 Loomio 的<a href='%{link}' target='_blank'>服務條款</a>。"
     success:
       header: 您就快完成了！請確認您的電子郵件信箱。
@@ -655,12 +664,22 @@ zh-TW:
     vote: 任何時候您都能改變您的立場
   pricing_page:
     header: 價格
-    social_mission_html: "我們的定價模式是由我們的社會使命所驅動： <strong>任何人都能輕鬆參與、討論決策、影響他人</strong>。"
-    loomio_for_organisations: 組織用的 Loomio
-    organisations_deal_html: 若您正在公司、正式組織或是職場中使用 Loomio，在 30 天的免費試用後，您將會被收取每月每人美金 1 元的訂閱費。
-    discuss_options_html: "若您想要討論適合您組織的價格選項，<a href=/contact#contact-form target='_blank'>連絡我們</a>。"
-    loomio_for_communities: 社群用的 Loomio
-    communities_deal: 錢永遠不會是人們在他們的社群中使用 Loomio 做大事的阻礙。如果您的團隊沒有足夠的預算來支付軟體費用，您就不需要支付訂閱的費用。但是，我們偶爾會詢問您的群組成員是否有自願性的捐款。
+    gift: 禮物
+    standard: 標準
+    plus: 白金
+    free_trial_html: "我們將會在<span>30天的免費試用</span>後，詢問您要選擇哪一個價格方案。不需要信用卡。"
+    get_started_for_free: 免費開始
+    gift_body_html: "<p>對於沒有預算支付訂閱費的群組。</p>\n<p>也支援捐款，不需要付任何費用。</p>\n"
+    gift_donation_ask: 我們將會詢問您的群組成員是否捐款。
+    unlimited_members: 無限的成員
+    unlimited_decisions: 無限的決策
+    email_support: 電子郵件支援
+    standard_price_html: "美元 <strong>$19</strong>/月<br><span>或</span> $190/年\n"
+    plus_body: 在標準價格中的每樣東西，再加上：
+    premium_support: 進階支援
+    custom_url: 自定義 URL
+    usage_statistics: 使用統計
+    plus_price_html: "美元 <strong>$179</strong>/month<br><span>or</span> $1790/year\n"
   contribution:
     any_amount: 或是自訂的單次贊助：
     currency_desc: 以美元作為單位
@@ -719,6 +738,7 @@ zh-TW:
     create_account_to_start_group: "請建立帳號，啟動您的群組「%{group_name}」"
     create_account: 請建立帳號
   invitation:
+    angular_warning_html: "<small> 任何接受您邀請的人都將會使用新的 Loomio 介面：<a href=\"http://blog.loomio.org/2015/10/14/one-step-closer-to-loomio-1-0/\" target=\"_blank\">了解更多</a>。</small>"
     alternate: 或者，分享這個連結讓別人能要求加入：
     by_email: 以電子郵件邀請
     invitation_not_found: 無法在該邀請碼內找到邀請函。請要求寄件者給一封新的。
@@ -737,7 +757,8 @@ zh-TW:
     invites_more_help2: "<p>您可以在任何時候邀請夥伴加入您的群組。</p><p>您可能想要馬上把所有的成員都邀請進來，或是一開始只邀請合作最緊密的那些夥伴。</p>"
     invitation_link: 邀請連結
     discussion_link: 參與討論串：
-    link_help: "點此連結加入 Loomio %{group}"
+    link_help: "點選連結以加入 %{group_name} 並開始："
+    thanks: 謝謝，
     copy: 若您並未收到邀請信件，您可以自行複製連結並且寄給您想邀請的人！
     pending_invitations: 擱置中的邀請函
     no_pending_invitations: 目前沒有擱置的邀請函。
@@ -749,12 +770,17 @@ zh-TW:
     empty_search: 空白搜尋
     please_enter_a_search: 請在上方的搜尋列中輸入搜尋字串
     no_match: 沒有任何搜尋結果符合您的搜尋字串
-  example_discussion:
-    title: "討論範例: 歡迎並介紹 Loomio"
-    description: "歡迎來到 Loomio，一套嶄新的群組決策制定工具。\n藉著激動人心的主題、討論各種觀點與資訊、針對出現的任何疑慮，您的群組能夠集思廣益，找出最佳的方式來前進。\n您能利用這個討論範例，玩轉此工具的各種功能特性。\n\n現在就讓世界轉動，Loomio 小幫手認為您的群組在假日聚在一起會是個很棒的主意。右邊的圓餅圖顯示您的群組有關這個提案的感想。您能藉著點擊下方的決策按鈕之一有發言權。\n"
-  example_motion:
-    name: 您應該去月球度個假！
-    description: "Loomio 小幫手真的熱切希望您的群組投資月球之旅。據說宇宙乳酪美味可口。但這麼做的話，您的碳足跡影響令人擔憂。\n這是一個好主意嗎？Loomio 小幫手要知道您怎麼想！\n假如您的立場是明確的，點擊以下的決策圖示之一 (移動滑鼠游標停在每個按鈕上會出現描述)。\n您會被提示要作出有關您決定的簡短聲明。這是讓大家能輕鬆看見您想法原由的摘要。您能自由改變您的心意、編輯您的決定直到這個提案結束。\n"
+  introduction_thread:
+    title: "歡迎來到 %{group_name}"
+    description: "請花一點時間來介紹您自己，並分享您是如何配合這個群組的夥伴們的。\n\n若您對這個 Loomio 群組有清楚的想法，您可以在此分享，這樣每個人就都可以有對如何一起實現有較清楚的想法。\n"
+  how_it_works_thread:
+    title: 如何使用 Loomio
+    description: "歡迎來到 Loomio，一個線上協同討論的地方。\n\n這是一個範例**討論串**。為何不使用這個空間來嘗試 Loomio 的功能呢？\n\n您目前正在閱讀討論串**內容**。使用此空間來給予群組背景資訊來進行一個有生產力的討論。\n\n **提案**區塊是您要做出決定的地方。您可以啟動並參與在此區塊的提案。\n\n **動態**區塊包含了一切在該討論串發生的活動。\n"
+  first_comment:
+    body: "大家好，我是 Loomio 小幫手機器人。\n\n若您想要讓在您群組裡的特定的人注意到您，在意見欄內輸入 @，後面跟著他們的名字。:)\n\n這裡有一些您可能會想要做的事情：\n- 設定您的 [簡歷照片](/profile)\n- 設定您的 [電子郵件設定](/email_preferences)\n- 在 [歡迎來到 %{group_name} 討論串](%{thread_url}) 中介紹自己\n\n若您有任何問題，第一個可以看的地方就是 [Loomio 說明手冊](http://help.loomio.org)。\n"
+  first_proposal:
+    name: 示範提案：走吧！
+    description: "這是提案的**描述**。您可以在這裡解釋行動的過程，並給予足夠的詳細資訊讓每個人都可以作出資訊足夠的決定。\n\n要參與提案，您可以選擇以下的四個選項其中之一：\n- **同意**：「我贊成就這麼進行。」\n- **棄權**：「我很樂意群組的決定沒有我的參與。」\n- **反對**：「我認為我們可以做的更好。」\n- **阻擋**：「我強烈反對並且不願意這個提案繼續下去。」\n\n當您選擇了四個選項的其中一個的時候，您將會被提醒要輸入一段簡短的聲明來解釋您的立場與為什麼您對這件事有此感受。您隨時都可以改變您的立場，只要提案仍是開放狀態。\n"
   contact_page:
     contact_us: 聯絡我們
     faq_prompt_html: 對 Loomio 團隊有任何問題？在聯絡我們之前，您應該先在我們的常見問題中找尋答案。
@@ -1145,3 +1171,18 @@ zh-TW:
     media: 媒體
     health: 健康
   start_your_group: 啟動您的群組
+  webhooks:
+    slack:
+      motion_closed: "*%{name}* 已定案"
+      motion_closing_soon: "*%{name}* 有一個即將在 24 小時內定案的提案"
+      motion_outcome_created: "*%{author}* 在 *%{name}* 中公佈了結果"
+      motion_outcome_updated: "*%{author}* 在 *%{name}* 中更新了結果"
+      new_motion: "*%{author}* 在 *%{name}* 中開始了一個新提議"
+      new_vote: "*%{author}* %{position} *%{proposal}* 在 *%{name}*"
+      new_discussion: "*%{author}* 在 *%{group}* 啟動了新的討論串"
+      view_it_on_loomio: 在 Loomio 上檢視
+      position_verbs:
+        "yes": 同意
+        "no": 反對
+        abstain: 棄權
+        block: 阻擋

@@ -7,7 +7,6 @@ class GroupsController < GroupBaseController
   before_filter :load_group, :except => [:create, :new]
   authorize_resource except: [:create, :members_autocomplete]
 
-  before_filter :ensure_group_is_setup, only: :show
   before_filter :assign_meta_data, only: :show
   after_filter :clear_discussion_index_caches, only: :show
   after_filter :track_visit, only: :show
@@ -70,7 +69,6 @@ class GroupsController < GroupBaseController
     @group = Group.new(permitted_params.group)
     authorize!(:create, @group)
     if @group.save
-      @group.mark_as_setup!
       @group.add_admin! current_user
       @group.creator = current_user
       flash[:success] = t("success.group_created")
@@ -82,16 +80,7 @@ class GroupsController < GroupBaseController
   end
 
   def update
-    if @group.update_attributes(permitted_params.group)
-
-      if @group.private_discussions_only?
-        @group.discussions.update_all(private: true)
-      end
-
-      if @group.public_discussions_only?
-        @group.discussions.update_all(private: false)
-      end
-
+    if GroupService.update(group: @group, params: permitted_params.group, actor: current_user)
       flash[:notice] = 'Group was successfully updated.'
       redirect_to @group
     else
@@ -155,13 +144,6 @@ class GroupsController < GroupBaseController
 
 
   private
-    def ensure_group_is_setup
-      if user_signed_in? && @group.admins.include?(current_user)
-        unless @group.is_setup? || @group.is_subgroup?
-          redirect_to setup_group_path(@group)
-        end
-      end
-    end
 
     def assign_meta_data
       if @group.is_visible_to_public?

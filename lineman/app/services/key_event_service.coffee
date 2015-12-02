@@ -12,11 +12,13 @@ angular.module('loomioApp').factory 'KeyEventService', ($rootScope) ->
       40:  'pressedDownArrow'
 
     broadcast: (event) ->
-      if key = @keyboardShortcuts[event.which]
+      key = @keyboardShortcuts[event.which]
+      if key == 'pressedEnter' or (key and !event.ctrlKey and !event.metaKey)
         $rootScope.$broadcast key, event, angular.element(document.activeElement)[0]
 
     registerKeyEvent: (scope, eventCode, execute, shouldExecute) ->
       shouldExecute = shouldExecute or @defaultShouldExecute
+      scope.$$listeners[eventCode] = null
       scope.$on eventCode, (angularEvent, originalEvent, active) ->
         if shouldExecute(active, originalEvent)
           angularEvent.preventDefault() and originalEvent.preventDefault()
@@ -28,5 +30,5 @@ angular.module('loomioApp').factory 'KeyEventService', ($rootScope) ->
     submitOnEnter: (scope) ->
       @registerKeyEvent scope, 'pressedEnter', scope.submit, (active, event) =>
         (event.ctrlKey or event.metaKey) and
-        angular.element(active).scope() == scope and
+        angular.element(active).scope().$$isolateBindings == scope.$$isolateBindings and
         _.contains(active.classList, 'lmo-primary-form-input')

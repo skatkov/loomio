@@ -2,9 +2,16 @@
   @include cardNoPadding;
 }
 
+.discussions-card__header{
+  margin: $cardPaddingSize;
+}
+
 .discussions-card__new-thread-button{
+  @include lmoBtnFeatured;
+  @include lmoBtnIcon;
   @include fontSmall;
   float: right;
+  margin-bottom: 10px;
 }
 
 .discussions-card__list--empty {
@@ -14,6 +21,10 @@
 }
 
 .discussions-card__list{
-  border-top: 1px solid $border-color;
   clear: both;
+}
+
+.discussions-card__show-more {
+  @include cardMinorAction;
+  @include lmoBtnLink;
 }

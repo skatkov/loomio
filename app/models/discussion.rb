@@ -1,6 +1,15 @@
 class Discussion < ActiveRecord::Base
   PER_PAGE = 50
   SALIENT_ITEM_KINDS = %w[new_comment new_motion new_vote motion_outcome_created]
+  THREAD_ITEM_KINDS = %w[new_comment
+                         new_motion
+                         new_vote
+                         motion_closed
+                         motion_closed_by_user
+                         motion_edited
+                         motion_outcome_created
+                         motion_outcome_updated
+                         discussion_edited]
   paginates_per PER_PAGE
 
   include ReadableUnguessableUrls
@@ -31,14 +40,15 @@ class Discussion < ActiveRecord::Base
   validate :privacy_is_permitted_by_group
 
   is_translatable on: [:title, :description], load_via: :find_by_key!, id_field: :key
-  has_paper_trail :only => [:title, :description]
+  has_paper_trail only: [:title, :description]
 
-  belongs_to :group, counter_cache: true
+  belongs_to :group
   belongs_to :author, class_name: 'User'
   belongs_to :user, foreign_key: 'author_id'
   has_many :motions, dependent: :destroy
-  has_one :current_motion, -> { where('motions.closed_at IS NULL').order('motions.closed_at ASC') }, class_name: 'Motion'
+  has_one :current_motion, -> { where('motions.closed_at IS NULL') }, class_name: 'Motion'
   has_one :most_recent_motion, -> { order('motions.created_at DESC') }, class_name: 'Motion'
+  has_one :search_vector
   has_many :votes, through: :motions
   has_many :comments, dependent: :destroy
   has_many :comment_likes, through: :comments, source: :comment_votes
@@ -47,14 +57,25 @@ class Discussion < ActiveRecord::Base
 
   has_many :events, -> { includes :user }, as: :eventable, dependent: :destroy
 
-  has_many :items, -> { includes(eventable: :user).order('created_at ASC') }, class_name: 'Event'
-  has_many :salient_items, -> { includes(eventable: :user).where(kind: SALIENT_ITEM_KINDS).order('created_at ASC') }, class_name: 'Event'
+  has_many :items, -> { includes(:user).where(kind: THREAD_ITEM_KINDS).order('created_at ASC') }, class_name: 'Event'
+  has_many :salient_items, -> { includes(:user).where(kind: SALIENT_ITEM_KINDS).order('created_at ASC') }, class_name: 'Event'
 
   has_many :discussion_readers
 
   include PgSearch
   pg_search_scope :search, against: [:title, :description],
     using: {tsearch: {dictionary: "english"}}
+
+
+  scope :search_for, ->(query, user, opts = {}) do
+    query = sanitize(query)
+     select(:id, :key, :title, :result_group_name, :description, :last_activity_at, :rank, "#{query} as query")
+    .select("ts_headline(discussions.description, plainto_tsquery(#{query}), 'ShortWord=0') as blurb")
+    .from(SearchVector.search_for(query, user, opts))
+    .joins("INNER JOIN discussions on subquery.discussion_id = discussions.id")
+    .where('rank > 0')
+    .order('rank DESC, last_activity_at DESC')
+  end
 
   delegate :name, to: :group, prefix: :group
   delegate :name, to: :author, prefix: :author
@@ -66,6 +87,13 @@ class Discussion < ActiveRecord::Base
 
   after_create :set_last_activity_at_to_created_at
 
+  define_counter_cache :motions_count do |discussion|
+    discussion.motions.count
+  end
+
+  update_counter_cache :group, :discussions_count
+  update_counter_cache :group, :motions_count
+
   def published_at
     created_at
   end
@@ -76,8 +104,7 @@ class Discussion < ActiveRecord::Base
 
   def archive!
     return if is_archived?
-    self.update_attribute(:archived_at, Time.now) and
-      Group.update_counters(group_id, discussions_count: -1)
+    self.update_attribute(:archived_at, Time.zone.now)
   end
 
   def is_archived?
@@ -128,8 +155,10 @@ class Discussion < ActiveRecord::Base
   end
 
   def thread_item_created!(item)
-    self.items_count += 1
-    self.last_item_at = item.created_at
+    if THREAD_ITEM_KINDS.include? item.kind
+      self.items_count += 1
+      self.last_item_at = item.created_at
+    end
 
     if SALIENT_ITEM_KINDS.include? item.kind
       self.salient_items_count += 1

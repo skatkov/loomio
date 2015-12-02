@@ -3,6 +3,7 @@ module.exports = require(process.env["LINEMAN_MAIN"]).config.extend "files",
     dest: "generated/angular/template-cache.js"
 
   sass:
+    main:  ['app/css/*.scss']
     app:   ['app/components/**/*.scss']
 
   css:
@@ -15,7 +16,6 @@ module.exports = require(process.env["LINEMAN_MAIN"]).config.extend "files",
   js:
     vendor: ["vendor/bower_components/lodash/lodash.js",
              "vendor/bower_components/moment/moment.js",
-             "vendor/bower_components/jquery/dist/jquery.js",
              "vendor/bower_components/ng-file-upload/angular-file-upload-shim.js",
              "vendor/bower_components/angular/angular.js",
              "vendor/bower_components/angular-mocks/angular-mocks.js",
@@ -38,4 +38,6 @@ module.exports = require(process.env["LINEMAN_MAIN"]).config.extend "files",
              "vendor/bower_components/angular-truncate/src/truncate.js",
              "vendor/bower_components/angular-scroll/angular-scroll.js",
              "vendor/bower_components/svg.js/dist/svg.js",
-             "node_modules/angular_record_store/dist/standalone.js" ]
+             "vendor/bower_components/jstimezonedetect/jstz.js",
+             "node_modules/angular_record_store/dist/standalone.js",
+             "vendor/bower_components/angular-elastic/elastic.js"]

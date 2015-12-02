@@ -8,7 +8,7 @@
 }
 
 .position-button {
-  @include box_shadow(1);
+  @include lmoBtn;
   margin-right: 5px;
   display: inline-block;
   width: 55px;
@@ -26,6 +26,10 @@
 
 .position_buttons_panel__buttons {
   margin-top: 10px;
+}
+
+.position-button:hover {
+  margin-top: -1px;
 }
 
 .position-button--dimmed{

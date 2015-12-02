@@ -1,8 +1,8 @@
 class API::CommentsController < API::RestfulController
+  include UsesDiscussionReaders
   before_filter :authenticate_user_by_email_api_key, only: :create
 
   load_resource only: [:like, :unlike]
-  before_filter :require_authenticated_user
 
   def like
     CommentService.like(comment: @comment, actor: current_user)
@@ -17,8 +17,9 @@ class API::CommentsController < API::RestfulController
   private
 
   def authenticate_user_by_email_api_key
-    user_id = request.headers['Loomio-User-Id']
-    key = request.headers['Loomio-Email-API-Key']
-    @current_user = User.where(id: user_id, email_api_key: key).first
+    @current_user = User.find_by id:            request.headers['Loomio-User-Id'],
+                                 email_api_key: request.headers['Loomio-Email-API-Key']
+    head :unauthorized unless current_user.is_logged_in?
   end
+
 end

@@ -2,13 +2,10 @@ class Events::NewMotion < Event
   def self.publish!(motion)
     event = create!(kind: "new_motion",
                     eventable: motion,
-                    discussion: motion.discussion)
+                    discussion: motion.discussion,
+                    created_at: motion.created_at)
 
-    dr = DiscussionReader.for(discussion: motion.discussion, user: motion.author)
-    dr.set_volume_as_required!
-    dr.participate!
-
-    UsersToEmailQuery.new_motion(motion).find_each do |user|
+    BaseMailer.send_bulk_mail(to: UsersToEmailQuery.new_motion(motion)) do |user|
       ThreadMailer.delay.new_motion(user, event)
     end
 

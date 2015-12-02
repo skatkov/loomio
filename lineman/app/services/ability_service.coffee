@@ -1,16 +1,36 @@
 angular.module('loomioApp').factory 'AbilityService', (CurrentUser) ->
   new class AbilityService
+
+    canAddComment: (thread) ->
+      CurrentUser.isMemberOf(thread.group())
+
+    canRespondToComment: (comment) ->
+      CurrentUser.isMemberOf(comment.group())
+
     canStartProposal: (thread) ->
       thread and
       !thread.hasActiveProposal() and
       (@canAdministerGroup(thread.group()) or
-       thread.group().membersCanRaiseProposals)
+      (CurrentUser.isMemberOf(thread.group()) and thread.group().membersCanRaiseMotions))
 
     canEditThread: (thread) ->
+      @canAdministerGroup(thread.group()) or
       CurrentUser.isMemberOf(thread.group()) and
-        (@canAdministerGroup(thread.group()) or
-         CurrentUser.isAuthorOf(thread) or
-         thread.group().membersCanEditDiscussions)
+      (CurrentUser.isAuthorOf(thread) or thread.group().membersCanEditDiscussions)
+
+    canMoveThread: (thread) ->
+      @canAdministerGroup(thread.group()) or
+      CurrentUser.isAuthorOf(thread)
+
+    canDeleteThread: (thread) ->
+      @canAdministerGroup(thread.group()) or
+      CurrentUser.isAuthorOf(thread)
+
+    canChangeThreadVolume: (thread) ->
+      CurrentUser.isMemberOf(thread.group())
+
+    canChangeGroupVolume: (group) ->
+      CurrentUser.isMemberOf(group)
 
     canVoteOn: (proposal) ->
       proposal.isActive() and
@@ -24,7 +44,7 @@ angular.module('loomioApp').factory 'AbilityService', (CurrentUser) ->
     canEditProposal: (proposal) ->
       proposal.isActive() and
       proposal.canBeEdited() and
-      (@canAdministerGroup(proposal.group()) or CurrentUser.isAuthorOf(proposal))
+      (@canAdministerGroup(proposal.group()) or (CurrentUser.isMemberOf(proposal.group()) and CurrentUser.isAuthorOf(proposal)))
 
     canCreateOutcomeFor: (proposal) ->
       @canSetOutcomeFor(proposal) and !proposal.hasOutcome()
@@ -39,13 +59,20 @@ angular.module('loomioApp').factory 'AbilityService', (CurrentUser) ->
     canAdministerGroup: (group) ->
       CurrentUser.isAdminOf(group)
 
+    isCreatorOf: (group) ->
+      CurrentUser.id == group.creatorId
+
+    canStartThread: (group) ->
+      group.membersCanStartDiscussions or @canAdministerGroup(group)
+
     canAddMembers: (group) ->
       @canAdministerGroup(group) or
       (CurrentUser.isMemberOf(group) and group.membersCanAddMembers)
 
     canCreateSubgroups: (group) ->
-      @canAdministerGroup(group) or
-      (CurrentUser.isMemberOf(group) and group.membersCanCreateSubgroups)
+      group.isParent() and
+      (@canAdministerGroup(group) or
+      (CurrentUser.isMemberOf(group) and group.membersCanCreateSubgroups))
 
     canEditGroup: (group) ->
       @canAdministerGroup(group)
@@ -54,11 +81,13 @@ angular.module('loomioApp').factory 'AbilityService', (CurrentUser) ->
       @canAdministerGroup(group)
 
     canEditComment: (comment) ->
+      CurrentUser.isMemberOf(comment.group()) and
       CurrentUser.isAuthorOf(comment) and
       (comment.isMostRecent() or comment.group().membersCanEditComments)
 
     canDeleteComment: (comment) ->
-      CurrentUser.isAuthorOf(comment) or
+      (CurrentUser.isMemberOf(comment.group()) and
+      CurrentUser.isAuthorOf(comment)) or
       @canAdministerGroup(comment.group())
 
     canRemoveMembership: (membership) ->
@@ -74,9 +103,15 @@ angular.module('loomioApp').factory 'AbilityService', (CurrentUser) ->
       (group.membersCanAddMembers and CurrentUser.isMemberOf(group)) or @canAdministerGroup(group)
 
     canViewGroup: (group) ->
-      group.visibleToPublic() or
-      CurrentUser.isMemberOf(group) or
-      (group.visibleToOrganisation() and CurrentUser.isMemberOf(group.parent()))
+      !group.privacyIsSecret() or
+      CurrentUser.isMemberOf(group)
+      # (group.visibleToOrganisation() and CurrentUser.isMemberOf(group.parent()))
+
+    canViewMemberships: (group) ->
+      CurrentUser.isMemberOf(group)
+
+    canViewPreviousProposals: (group) ->
+      CurrentUser.isMemberOf(group)
 
     canJoinGroup: (group) ->
       (group.membershipGrantedUpon == 'request') and

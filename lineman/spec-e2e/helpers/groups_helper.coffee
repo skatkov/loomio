@@ -2,6 +2,12 @@ module.exports = new class GroupsHelper
   load: ->
     browser.get('http://localhost:8000/development/setup_group')
 
+  loadPath: (path) ->
+    browser.get('http://localhost:8000/development/'+path)
+
+  loadNew: ->
+    browser.get('http://localhost:8000/development/setup_new_group')
+
   loadToJoin: (value) ->
     browser.get("http://localhost:8000/development/setup_group_to_join?membership_granted_upon=#{value}")
 
@@ -26,29 +32,29 @@ module.exports = new class GroupsHelper
   clickEditGroupOption: ->
     element(By.css('.group-page-actions__edit-group-link')).click()
 
-  changeGroupVisibilitySettings: ->
-    element(By.css('.edit-group-form__visible-to option[value=members]')).click()
-
   # changeGroupPermissionsOptions: ->
-  #   element(By.css('.edit-group-form__group-members-can-add-members')).click()
-  #   element(By.css('.edit-group-form__group-members-can-create-subgroups')).click()
-  #   element(By.css('.edit-group-form__group-members-can-start-discussions')).click()
-  #   element(By.css('.edit-group-form__group-members-can-edit-discussions')).click()
-  #   element(By.css('.edit-group-form__group-members-can-edit-comments')).click()
-  #   element(By.css('.edit-group-form__group-members-can-raise-motions')).click()
+  #   element(By.css('.group-form__group-members-can-add-members')).click()
+  #   element(By.css('.group-form__group-members-can-create-subgroups')).click()
+  #   element(By.css('.group-form__group-members-can-start-discussions')).click()
+  #   element(By.css('.group-form__group-members-can-edit-discussions')).click()
+  #   element(By.css('.group-form__group-members-can-edit-comments')).click()
+  #   element(By.css('.group-form__group-members-can-raise-motions')).click()
 
-  visitEditGroupPage: ->
+  openGroupSettings: ->
     @openMemberOptionsDropdown()
     @clickEditGroupOption()
 
   votePermissionsCheckbox: ->
-    element(By.css('.edit-group-form__members-can-vote'))
+    element(By.css('.group-form__members-can-vote'))
+
+  expandAdvancedSettings: ->
+    element(By.css('.group-form__advanced-link')).click()
 
   changeVotingPermissions: ->
     @votePermissionsCheckbox().click()
 
   groupNameInput: ->
-    element(By.css('.edit-group-form__name'))
+    element(By.css('.group-form__name input'))
 
   editGroupName: (name) ->
     @groupNameInput().clear().sendKeys(name)
@@ -56,23 +62,23 @@ module.exports = new class GroupsHelper
   clearGroupNameInput: ->
     @groupNameInput().clear()
 
-  editGroupFormValidationErrors: ->
+  GroupFormValidationErrors: ->
     element(By.css('.lmo-validation-error'))
 
   editGroupDescription: (description) ->
-    element(By.css('.edit-group-form__description')).sendKeys(description)
+    element(By.css('.group-form__description textarea')).sendKeys(description)
 
   groupPageDescriptionText: ->
     element(By.css('.group-page__description-text'))
 
-  submitEditGroupForm: ->
-    element(By.css('.edit-group-form__submit-button')).click()
+  submitGroupForm: ->
+    element(By.css('.group-form__submit-button')).click()
 
   groupPage: ->
-    element(By.css('.group-page'))
+    element(By.css('.group-page')).getText()
 
   groupPageHeader: ->
-    element(By.css('.group-page__name h1'))
+    element(By.css('.group-theme__name h1'))
 
   clickJoinGroupButton: ->
     element(By.css('.join-group-button__join-group')).click()
@@ -105,12 +111,12 @@ module.exports = new class GroupsHelper
     element(By.css('.group-page-actions__archive-group')).click()
 
   confirmLeaveGroup: ->
-    element(By.css('.leave-group-form__submit')).click()
+    element(By.css('.leave-group-form__submit-button')).click()
 
   confirmArchiveGroup: ->
-    element(By.css('.archive-group-form__submit')).click()
+    element(By.css('.archive-group-form__submit-button')).click()
 
-  visitGroupPage: ->
+  visitGroupsPage: ->
     element(By.css('.groups-item')).click()
 
   groupsList: ->
@@ -123,14 +129,37 @@ module.exports = new class GroupsHelper
     element(By.css('.leave-group-form__add-coordinator')).click()
 
   clickStartSubgroupLink: ->
-    browser.sleep(4000) # this has been a tempremantal test, ugh
     element(By.css('.subgroups-card__add-subgroup-link')).click()
 
-  fillInSubgroupName: (name) ->
-    element(By.css('.start-group-form__name')).sendKeys(name)
-
-  submitSubgroupForm: ->
-    element(By.css('.start-group-form__submit')).click()
-
   groupName: ->
-    element(By.css('.group-page__name')).getText()
+    element(By.css('.group-theme__name')).getText()
+
+  visitFirstGroup: ->
+    element.all(By.css('.groups-page__parent-group-name a')).first().click()
+
+  clickAddSubgroupLink: ->
+    element(By.css('.group-page-actions__add-subgroup-link')).click()
+
+  groupVolumeCard: ->
+    element(By.css('.group-volume-card')).getText()
+
+  clickChangeInGroupVolumeCard: ->
+    element(By.css('.group-volume-card__change-volume-link')).click()
+
+  changeGroupVolumeToLoud: ->
+    element(By.id('volume-loud')).click()
+
+  submitChangeVolumeForm: ->
+    element(By.css('.change-volume-form__submit')).click()
+
+  welcomeModal: ->
+    element(By.css('.group-welcome-modal'))
+
+  dismissWelcomeModal: ->
+    element(By.css('.lmo-btn--primary')).click()
+
+  visitMembersPage: ->
+    element(By.css('.members-card__manage-members')).click()
+
+  returnToGroupPage: ->
+    element(By.css('.lmo-h1')).click()

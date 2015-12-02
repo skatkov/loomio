@@ -1,13 +1,15 @@
-angular.module('loomioApp').factory 'DiscussionModel', (BaseModel, AppConfig) ->
-  class DiscussionModel extends BaseModel
+angular.module('loomioApp').factory 'DiscussionModel', (DraftableModel, AppConfig) ->
+  class DiscussionModel extends DraftableModel
     @singular: 'discussion'
     @plural: 'discussions'
     @uniqueIndices: ['id', 'key']
     @indices: ['groupId', 'authorId']
+    @draftParent: 'group'
     @serializableAttributes: AppConfig.permittedParams.discussion
 
     afterConstruction: ->
-      @private = @privateDefaultValue()
+      if @isNew()
+        @private = @privateDefaultValue()
 
     defaultValues: =>
       private: null
@@ -74,10 +76,7 @@ angular.module('loomioApp').factory 'DiscussionModel', (BaseModel, AppConfig) ->
       proposal.lastVoteAt if proposal?
 
     isUnread: ->
-      if @lastReadAt?
-        @unreadActivityCount() > 0
-      else
-        true
+      @discussionReaderId? and (!@lastReadAt? or @unreadActivityCount() > 0)
 
     isImportant: ->
       @starred or @hasActiveProposal()
@@ -105,16 +104,33 @@ angular.module('loomioApp').factory 'DiscussionModel', (BaseModel, AppConfig) ->
       item = _.max @events(), (event) -> event.sequenceId or 0
       item.sequenceId
 
-    changeVolume: (volume) ->
-      @remote.patchMember @keyOrId(), 'set_volume', { volume: volume }
+    membershipVolume: ->
+      membership = @recordStore.memberships.find(userId: AppConfig.currentUserId, groupId: @groupId)[0]
+      membership.volume if membership
 
-    toggleStar: ->
-      @remote.patchMember @keyOrId(), if @starred then 'unstar' else 'star'
+    volume: ->
+      @discussionReaderVolume or @membershipVolume()
+
+    changeVolume: =>
+      @remote.patchMember @keyOrId(), 'set_volume', { volume: @discussionReaderVolume }
+
+    isMuted: ->
+      @volume() == 'mute'
+
+    saveStar: ->
+      @remote.patchMember @keyOrId(), if @starred then 'star' else 'unstar'
 
     markAsRead: (sequenceId) ->
       if isNaN(sequenceId)
         sequenceId = @lastSequenceId
+        @update(readItemsCount: @itemsCount,
+                readSalientItemsCount: @salientItemsCount,
+                readCommentsCount: @commentsCount,
+                lastReadAt: moment())
 
       if _.isNull(@lastReadAt) or @lastReadSequenceId < sequenceId
         @remote.patchMember(@keyOrId(), 'mark_as_read', {sequence_id: sequenceId})
         @lastReadSequenceId = sequenceId
+
+    move: =>
+      @remote.patchMember @keyOrId(), 'move', { group_id: @groupId }

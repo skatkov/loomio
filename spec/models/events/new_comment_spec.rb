@@ -6,8 +6,6 @@ describe Events::NewComment do
   let(:comment) { create :comment, discussion: discussion, author: user }
 
   describe "::publish!" do
-    let(:event) { double(:event, notify_users!: true) }
-    before { Event.stub(:create!).and_return(event) }
 
     it 'creates an event' do
       Event.should_receive(:create!).with(kind: 'new_comment',
@@ -17,13 +15,12 @@ describe Events::NewComment do
       Events::NewComment.publish!(comment)
     end
 
-    it 'marks the discussion reader as participating' do
-      Events::NewComment.publish!(comment)
-      expect(DiscussionReader.for(user: comment.author, discussion: comment.discussion).participating).to be_truthy
+    it 'returns an event' do
+      expect(Events::NewComment.publish!(comment).class).to eq Events::NewComment
     end
 
-    it 'returns an event' do
-      expect(Events::NewComment.publish!(comment)).to eq event
+    it 'uses its group as the channel to publish to' do
+      expect(Events::NewComment.publish!(comment).send(:channel_object)).to eq discussion.group
     end
 
     it 'does not publish a comment replied to event if there is no parent' do

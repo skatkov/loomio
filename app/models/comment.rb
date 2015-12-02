@@ -2,7 +2,7 @@ class Comment < ActiveRecord::Base
   include Twitter::Extractor
   include Translatable
 
-  has_paper_trail
+  has_paper_trail only: [:body]
   acts_as_tree
   is_translatable on: :body
 
@@ -93,9 +93,12 @@ class Comment < ActiveRecord::Base
     save!
   end
 
+  def mentioned_usernames
+    extract_mentioned_screen_names(self.body).uniq
+  end
+
   def mentioned_group_members
-    usernames = extract_mentioned_screen_names(self.body)
-    group.users.where(username: usernames).where('users.id != ?', author.id)
+    group.users.where(username: mentioned_usernames).where('users.id != ?', author.id)
   end
 
   def likes_count

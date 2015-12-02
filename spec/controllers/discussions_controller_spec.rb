@@ -5,7 +5,7 @@ describe DiscussionsController do
   let(:user) { FactoryGirl.create(:user) }
   let(:other_user) { FactoryGirl.create(:user) }
   let(:motion) { mock_model(Motion).as_null_object }
-  let(:group) { create :group }
+  let(:group) { create :group, visible_to: 'public', is_visible_to_public: true, discussion_privacy_options: 'public_or_private' }
   let(:discussion) { stub_model(Discussion,
                                 title: "Top ten",
                                 key: 'abc123',
@@ -20,6 +20,8 @@ describe DiscussionsController do
       app_controller.stub(:authorize!).and_return(true)
       app_controller.stub(:cannot?).with(:show, group).and_return(false)
       Discussion.stub_chain(:published, :find_by_key!).with(discussion.key).and_return(discussion)
+      Discussion.stub_chain(:published, :count).and_return(1)
+      Discussion.stub_chain(:published, :sum).and_return(1)
       User.stub(:find).and_return(user)
       Group.stub(:find).with(group.key).and_return(group)
     end
@@ -45,10 +47,10 @@ describe DiscussionsController do
 
     describe "moving a discussion" do
 
-      context "from a public group to a private group" do 
-        it "makes the discussion private" do 
+      context "from a public group to a private group" do
+        it "makes the discussion private" do
           g = FactoryGirl.create :group, discussion_privacy_options: 'private_only'
-          d = FactoryGirl.create :discussion, private: false
+          d = FactoryGirl.create :discussion, group: group, private: false
           Group.stub(:find).with(g.key).and_return(g)
           Discussion.stub_chain(:published, :find_by_key!).with(d.key).and_return(d)
 
@@ -63,12 +65,12 @@ describe DiscussionsController do
       end
 
       context "from a private group to a public group" do
-        it "makes the discussion public" do 
+        it "makes the discussion public" do
           g = FactoryGirl.create :group, discussion_privacy_options: 'public_only'
           d = FactoryGirl.create :discussion, private: true
           Group.stub(:find).with(g.key).and_return(g)
           Discussion.stub_chain(:published, :find_by_key!).with(d.key).and_return(d)
-          
+
           d.group.admins << user
           g.members << user
 
@@ -79,8 +81,8 @@ describe DiscussionsController do
         end
       end
 
-      context "to a group with a different user as admin" do 
-        it "successfully moves the discussion" do 
+      context "to a group with a different user as admin" do
+        it "successfully moves the discussion" do
           g1 = FactoryGirl.create :group
           g2 = FactoryGirl.create :group
           d = FactoryGirl.create :discussion, group: g1

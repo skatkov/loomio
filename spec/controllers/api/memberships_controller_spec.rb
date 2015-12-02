@@ -46,6 +46,45 @@ describe API::MembershipsController do
         usernames = json['users'].map { |c| c['name'] }
         expect(usernames.sort).to eq usernames
       end
+
+      context 'logged out' do
+        before { @controller.stub(:current_user).and_return(LoggedOutUser.new) }
+        let(:private_group) { create(:group, is_visible_to_public: false) }
+
+        it 'returns users filtered by group for a public group' do
+          get :index, group_id: group.id, format: :json
+          json = JSON.parse(response.body)
+          expect(json.keys).to include *(%w[users memberships groups])
+          users = json['users'].map { |c| c['id'] }
+          groups = json['groups'].map { |g| g['id'] }
+          expect(users).to include user_named_biff.id
+          expect(users).to_not include alien_named_biff.id
+          expect(groups).to include group.id
+        end
+
+        it 'responds with unauthorized for private groups' do
+          get :index, group_id: private_group.id, format: :json
+          expect(response.status).to eq 403
+        end
+      end
+    end
+  end
+
+  describe 'for_user' do
+    let(:public_group) { create :group, is_visible_to_public: true }
+    let(:private_group) { create :group, is_visible_to_public: false }
+
+    it 'returns visible groups for the given user' do
+      public_group
+      private_group.users << another_user
+      group.users << another_user
+
+      get :for_user, user_id: another_user.id
+      json = JSON.parse(response.body)
+      group_ids = json['groups'].map { |g| g['id'] }
+      expect(group_ids).to include group.id
+      expect(group_ids).to_not include public_group.id
+      expect(group_ids).to_not include private_group.id
     end
   end
 
@@ -119,6 +158,20 @@ describe API::MembershipsController do
         users = json['users'].map { |c| c['id'] }
         groups = json['groups'].map { |g| g['id'] }
         expect(users).to include alien_named_biff.id
+      end
+
+      it 'does not return duplicate users' do
+        third_group = create(:group)
+        third_group.users << user
+        third_group.users << user_named_biff
+        another_group.users << user_named_biff
+
+        get :invitables, group_id: group.id, q: 'biff', format: :json
+        json = JSON.parse(response.body)
+        memberships = json['memberships'].map { |m| m['id'] }
+        users = json['users'].map { |u| u['id'] }
+        expect(users).to include user_named_biff.id
+        expect(users.length).to eq memberships.length
       end
 
     end

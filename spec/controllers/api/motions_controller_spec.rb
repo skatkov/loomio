@@ -3,13 +3,15 @@ describe API::MotionsController do
 
   let(:user) { create :user }
   let(:another_user) { create :user }
-  let(:group) { create :group }
-  let(:discussion) { create :discussion, group: group }
+  let(:group) { create :group, is_visible_to_public: true  }
+  let(:discussion) { create :discussion, group: group, private: false }
+  let(:private_discussion) { create :discussion, group: group, private: true }
+  let(:private_motion) { create :motion, discussion: private_discussion }
   let(:motion) { create :motion, discussion: discussion }
+  let(:another_motion) { create :motion }
   let(:motion_params) {{
     name: 'hello',
     description: 'is it me you\'re looking for?',
-    closing_at: '2013-05-05 02:00',
     discussion_id: discussion.id
   }}
 
@@ -18,7 +20,38 @@ describe API::MotionsController do
     sign_in user
   end
 
-   describe 'index' do
+  describe 'show' do
+
+    it 'returns motions the user has access to' do
+      get :show, id: motion.id, format: :json
+      json = JSON.parse(response.body)
+      motion_ids = json['proposals'].map { |m| m['id'] }
+      expect(motion_ids).to eq [motion.id]
+    end
+
+    it 'returns unauthorized for motions the user does not have access to' do
+      get :show, id: another_motion.id, format: :json
+      expect(response.status).to eq 403
+    end
+
+    context 'logged out' do
+      before { @controller.stub(:current_user).and_return(LoggedOutUser.new) }
+
+      it 'returns a motion if it is public' do
+        get :show, id: motion.id, format: :json
+        json = JSON.parse(response.body)
+        motion_ids = json['proposals'].map { |m| m['id'] }
+        expect(motion_ids).to eq [motion.id]
+      end
+
+      it 'returns unauthorized if it is not public' do
+        get :show, id: private_motion.id, format: :json
+        expect(response.status).to eq 403
+      end
+    end
+  end
+
+  describe 'index' do
     let(:another_discussion)    { create :discussion }
     let(:another_motion)      { create :motion, discussion: another_discussion }
 
@@ -34,6 +67,41 @@ describe API::MotionsController do
         motion_ids = json['proposals'].map { |v| v['id'] }
         expect(motion_ids).to include motion.id
         expect(motion_ids).to_not include another_motion.id
+      end
+
+      context 'logged out' do
+        before { @controller.stub(:current_user).and_return(LoggedOutUser.new) }
+
+        it 'returns motions filtered for public discussion' do
+          get :index, discussion_id: discussion.id, format: :json
+          json = JSON.parse(response.body)
+          expect(json.keys).to include *(%w[proposals])
+          motion_ids = json['proposals'].map { |v| v['id'] }
+          expect(motion_ids).to include motion.id
+          expect(motion_ids).to_not include another_motion.id
+        end
+
+        it 'returns unauthorized for private discussion' do
+          get :index, discussion_id: private_discussion.id, format: :json
+        end
+      end
+    end
+  end
+
+  describe 'close' do
+    context 'success' do
+      it "closes a motion" do
+        post :close, id: motion.id, format: :json
+        expect(response).to be_success
+        expect(motion.reload.closed_at).not_to eq nil
+      end
+    end
+
+    context 'failure' do
+      it "responds with an error when the user is unauthorized" do
+        sign_in another_user
+        post :close, id: motion.id
+        expect(JSON.parse(response.body)['exception']).to eq 'CanCan::AccessDenied'
       end
     end
   end
@@ -119,6 +187,12 @@ describe API::MotionsController do
           closed_at
           last_vote_at
           vote_counts])
+      end
+
+      it 'responds with a discussion with a reader' do
+        post :create, motion: motion_params
+        json = JSON.parse(response.body)
+        expect(json['discussions'][0]['discussion_reader_id']).to be_present
       end
     end
 

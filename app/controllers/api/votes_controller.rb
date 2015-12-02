@@ -1,14 +1,12 @@
 class API::VotesController < API::RestfulController
+  include UsesDiscussionReaders
 
   alias :update :create
 
   def my_votes
-    @votes = if params[:discussion_id]
-      load_and_authorize :discussion
-      @discussion.votes.for_user(current_user).most_recent
-    else
-      current_user.votes.most_recent.since(3.months.ago).most_recent
-    end
+    @votes = current_user.votes.most_recent.includes({motion: :discussion}, :user)
+    @votes = @votes.where('motions.discussion_id': @discussion.id) if load_and_authorize(:discussion, optional: true)
+    @votes = @votes.where('discussions.group_id': @group.id)       if load_and_authorize(:group, optional: true)
     respond_with_collection
   end
 

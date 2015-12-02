@@ -1,4 +1,4 @@
-angular.module('loomioApp').factory 'ThreadQueryService', (Records) ->
+angular.module('loomioApp').factory 'ThreadQueryService', (Records, CurrentUser) ->
   new class ThreadQueryService
 
     filterQuery: (filter, options = {}) ->
@@ -16,26 +16,23 @@ angular.module('loomioApp').factory 'ThreadQueryService', (Records) ->
       any: ->     @length() > 0
 
     createBaseView = (filters, queryType) ->
-      _.memoize(->
-        view = Records.discussions.collection.addDynamicView 'default'
-        applyFilters(view, filters, queryType)
-        view)()
+      view = Records.discussions.collection.addDynamicView 'default'
+      applyFilters(view, filters, queryType)
+      view
 
     createGroupView = (group, filters, queryType) ->
-      _.memoize(->
-        view = Records.discussions.collection.addDynamicView group.name
-        view.applyFind({groupId: { $in: group.organisationIds() }})
-        applyFilters(view, filters, queryType)
-        view)()
+      view = Records.discussions.collection.addDynamicView group.name
+      view.applyFind({groupId: { $in: group.organisationIds() }})
+      applyFilters(view, filters, queryType)
+      view
 
     createTimeframeView = (name, filters, queryType, from, to) ->
       today = moment().startOf 'day'
-      _.memoize(->
-        view = Records.discussions.collection.addDynamicView name
-        view.applyFind(lastActivityAt: { $gt: parseTimeOption(from) })
-        view.applyFind(lastActivityAt: { $lt: parseTimeOption(to) })
-        applyFilters(view, filters, queryType)
-        view)()
+      view = Records.discussions.collection.addDynamicView name
+      view.applyFind(lastActivityAt: { $gt: parseTimeOption(from) })
+      view.applyFind(lastActivityAt: { $lt: parseTimeOption(to) })
+      applyFilters(view, filters, queryType)
+      view
 
     parseTimeOption = (options) ->
       # we pass times in something human-readable like '1 month ago'
@@ -46,7 +43,7 @@ angular.module('loomioApp').factory 'ThreadQueryService', (Records) ->
     applyFilters = (view, filters, queryType) ->
       filters = [].concat filters
 
-      view.applyFind(discussionReaderId: { $ne: null })
+      view.applyFind(discussionReaderId: { $gt: 0 })
 
       switch queryType
         when 'important' then view.applyWhere (thread) -> thread.isImportant()
@@ -55,16 +52,16 @@ angular.module('loomioApp').factory 'ThreadQueryService', (Records) ->
           view.applyFind(lastActivityAt: { $gt: moment().startOf('day').subtract(6, 'week').toDate() })
           view.applyWhere (thread) -> thread.isUnread()
 
-      if _.contains(filters, 'show_muted')
-        view.applyFind(volume: { $eq: 'mute' })
-      else
-        view.applyFind(volume: { $ne: 'mute' })
-
       _.each filters, (filter) ->
         switch filter
-          when 'show_participating' then view.applyFind(participating: true)
-          when 'show_starred'       then view.applyFind(starred: true)
-          when 'show_proposals'     then view.applyWhere (thread) -> thread.hasActiveProposal()
-          when 'hide_proposals'     then view.applyWhere (thread) -> !thread.hasActiveProposal()
+          when 'show_muted'
+            view.applyWhere (thread) -> thread.volume() == 'mute'
+          when 'show_not_muted'
+            view.applyWhere (thread) -> thread.volume() != 'mute'
+          when 'only_threads_in_my_groups' then view.applyFind(groupId: {$in: CurrentUser.groupIds()})
+          when 'show_participating'        then view.applyFind(participating: true)
+          when 'show_starred'              then view.applyFind(starred: true)
+          when 'show_proposals'            then view.applyWhere (thread) -> thread.hasActiveProposal()
+          when 'hide_proposals'            then view.applyWhere (thread) -> !thread.hasActiveProposal()
 
       view

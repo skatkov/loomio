@@ -18,6 +18,12 @@ class DiscussionReader < ActiveRecord::Base
     end
   end
 
+  def author_thread_item!(time)
+    set_volume_as_required!
+    participate!
+    viewed! time
+  end
+
   def set_volume_as_required!
     if user.email_on_participation?
       set_volume! :loud unless volume_is_loud?
@@ -36,12 +42,13 @@ class DiscussionReader < ActiveRecord::Base
     end
   end
 
-  def first_read?
-    last_read_at.blank?
+  def discussion_reader_volume
+    # Crazy James says: necessary in order to get a string back from the volume enum, rather than an integer
+    self.class.volumes.invert[self[:volume]]
   end
 
-  def user_or_logged_out_user
-    user || LoggedOutUser.new
+  def first_read?
+    last_read_at.blank?
   end
 
   def unread_comments_count
@@ -81,7 +88,7 @@ class DiscussionReader < ActiveRecord::Base
     return if user.nil?
     read_at = age_of_last_read_item || discussion.last_activity_at
 
-    if self.last_read_at.nil? or (read_at > self.last_read_at)
+    if self.last_read_at.nil? or (read_at >= self.last_read_at)
       self.last_read_at = read_at
       reset_counts!
     end

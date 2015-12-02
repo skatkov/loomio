@@ -5,16 +5,13 @@
     .proposal-pie-chart__pie.media-left
       %pie_chart.proposal-positions-panel__pie-chart{votes: 'proposal.voteCounts'}
     .proposal-pie-chart__legend.media-body
-      %label.sr-only{translate: 'proposal_expanded.current_votes'}
-      %table
+      %table#proposal-current-positions{role: 'presentation'}
+        %caption.sr-only{translate: 'proposal_expanded.current_votes'}
         %tbody
           %tr{ng-repeat: 'position in proposal.positions'}
             %td
-              .proposal-pie-chart__icon{class: 'proposal-pie-chart__icon--{{position}}'}
-                &nbsp;
-            %td
-              .proposal-pie-chart__label
-                {{ "proposal_position_"+position | translate}} ({{ proposal.voteCounts[position] }})
+              .proposal-pie-chart__label{class: 'proposal-pie-chart__label--{{position}}'}
+                {{ proposal.voteCounts[position] }} {{ "proposal_position_"+position | translate}}
   .proposal-pie-chart__participation-statement{translate: 'proposal_pie_chart.participation_statement', translate-value-percentage: '{{proposal.percentVoted()}}', translate-value-number: '{{proposal.numberVoted()}}', translate-value-total: '{{proposal.groupSizeWhenVoting()}}'}
 
   %ul.proposal-positions-panel__list
@@ -22,10 +19,10 @@
       .media-left
         .thread-item__vote-icon{class: 'thread-item__vote-icon--{{vote.position}}'}
       .media-body
-        %span.proposal-positions-panel__name-and-position{translate: "new_vote_item.{{vote.positionVerb()}}", translate-value-name: '{{vote.authorName()}}'}
+        %span.proposal-positions-panel__name-and-position{translate: "new_vote_item.{{vote.positionVerb()}}", translate-value-actor: '{{vote.authorName()}}'}
         %span{ng-if: '!vote.hasStatement()'}.
         %span{ng-if: 'vote.hasStatement()'}: {{::vote.statement}}
-        %a.proposal-positions-panel__change-your-vote{href: '', ng-click: 'changeVote()', ng-show: 'proposal.isActive() && voteIsMine(vote)'}
-          %i.fa.fa-exchange{aria-hidden: 'true'}>
+        %button.proposal-positions-panel__change-your-vote{ng-if: 'showChangeVoteOption(vote)', href: '', ng-click: 'changeVote()'}
+          %i.fa.fa-exchange>
           %span{translate: 'proposal_positions_panel.change_your_vote'}
   %undecided_panel{proposal: 'proposal'}

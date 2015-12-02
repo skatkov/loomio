@@ -3,20 +3,23 @@ angular.module('loomioApp').directive 'discussionsCard', ->
   restrict: 'E'
   templateUrl: 'generated/components/group_page/discussions_card/discussions_card.html'
   replace: true
-  controller: ($scope, Records, ModalService, DiscussionForm, KeyEventService, LoadingService, AbilityService, CurrentUser) ->
+  controller: ($scope, Records, ModalService, DiscussionForm, ThreadQueryService,  KeyEventService, LoadingService, AbilityService, CurrentUser) ->
     $scope.loaded = 0
     $scope.perPage = 25
     $scope.canLoadMoreDiscussions = true
+    $scope.discussions = []
+
+    $scope.updateDiscussions = (data = {}) ->
+      $scope.discussions = ThreadQueryService.groupQuery($scope.group, { filter: 'all', queryType: 'all' })
+      if (data.discussions or []).length < $scope.perPage
+        $scope.canLoadMoreDiscussions = false
 
     $scope.loadMore = ->
       options =
-        group_id: $scope.group.id
         from:     $scope.loaded
         per:      $scope.perPage
       $scope.loaded += $scope.perPage
-      Records.discussions.fetchByGroup(options).then (data) ->
-        if (data.discussions or []).length < $scope.perPage
-          $scope.canLoadMoreDiscussions = false
+      Records.discussions.fetchByGroup($scope.group.key, options).then $scope.updateDiscussions, -> $scope.canLoadMoreDiscussions = false
 
     LoadingService.applyLoadingFunction $scope, 'loadMore'
     $scope.loadMore()
@@ -26,10 +29,12 @@ angular.module('loomioApp').directive 'discussionsCard', ->
                         discussion: -> Records.discussions.build(groupId: $scope.group.id)
 
     $scope.showThreadsPlaceholder = ->
-      AbilityService.canAdministerGroup($scope.group) and $scope.group.discussions().length <= 1
+      AbilityService.canAdministerGroup($scope.group) and $scope.group.discussions().length < 3
 
     $scope.whyImEmpty = ->
-      if !$scope.group.hasDiscussions
+      if !AbilityService.canViewGroup($scope.group)
+        'discussions_are_private'
+      else if !$scope.group.hasDiscussions
         'no_discussions_in_group'
       else if $scope.group.discussionPrivacyOptions == 'private_only'
         'discussions_are_private'

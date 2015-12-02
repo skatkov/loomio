@@ -1,21 +1,47 @@
-angular.module('loomioApp').factory 'GroupModel', (BaseModel, AppConfig) ->
-  class GroupModel extends BaseModel
+angular.module('loomioApp').factory 'GroupModel', (DraftableModel, AppConfig) ->
+  class GroupModel extends DraftableModel
     @singular: 'group'
     @plural: 'groups'
     @uniqueIndices: ['id', 'key']
     @indices: ['parentId']
     @serializableAttributes: AppConfig.permittedParams.group
+    @draftParent: 'draftParent'
+
+    draftParent: ->
+      @parent() or @recordStore.users.find(AppConfig.currentUserId)
 
     defaultValues: ->
       parentId: null
+      name: ''
+      description: ''
+      groupPrivacy: 'closed'
+      isVisibleToPublic: true
+      discussionPrivacyOptions: 'private_only'
+      membershipGrantedUpon: 'approval'
+      membersCanAddMembers: true
+      membersCanEditDiscussions: true
+      membersCanEditComments: true
+      membersCanRaiseMotions: true
+      membersCanVote: true
+      membersCanStartDiscussions: true
+      membersCanCreateSubgroups: false
+      motionsCanBeEdited: false
 
     relationships: ->
       @hasMany 'discussions'
+      @hasMany 'proposals'
       @hasMany 'membershipRequests'
       @hasMany 'memberships'
       @hasMany 'invitations'
       @hasMany 'subgroups', from: 'groups', with: 'parentId', of: 'id'
       @belongsTo 'parent', from: 'groups'
+
+    closedProposals: ->
+      _.filter @proposals(), (proposal) ->
+        proposal.isClosed()
+
+    hasPreviousProposals: ->
+      _.some @closedProposals()
 
     pendingMembershipRequests: ->
       _.filter @membershipRequests(), (membershipRequest) ->
@@ -43,7 +69,7 @@ angular.module('loomioApp').factory 'GroupModel', (BaseModel, AppConfig) ->
       _.some @pendingInvitations()
 
     organisationDiscussions: ->
-      @recordStore.discussions.find(groupId: { $in: @organisationIds()})
+      @recordStore.discussions.find(groupId: { $in: @organisationIds() }, discussionReaderId: { $ne: null })
 
     organisationIds: ->
       _.pluck(@subgroups(), 'id').concat(@id)
@@ -79,26 +105,20 @@ angular.module('loomioApp').factory 'GroupModel', (BaseModel, AppConfig) ->
     adminIds: ->
       _.map @adminMemberships(), (membership) -> membership.userId
 
-    fullName: (separator = '-') ->
-      if @parentId?
-        "#{@parentName()} #{separator} #{@name}"
-      else
-        @name
-
     parentName: ->
       @parent().name if @parent()?
 
-    parentIsHidden: ->
-      @parent().visibleToPublic() if @parentId?
+    privacyIsOpen: ->
+      @groupPrivacy == 'open'
 
-    visibleToPublic: ->
-      @visibleTo == 'public'
+    privacyIsClosed: ->
+      @groupPrivacy == 'closed'
 
-    visibleToOrganisation: ->
-      @visibleTo == 'parent_members'
+    privacyIsSecret: ->
+      @groupPrivacy == 'secret'
 
-    visibleToMembers: ->
-      @visibleTo == 'members'
+    allowPublicDiscussions: ->
+      @discussionPrivacyOptions != 'private_only'
 
     isSubgroup: ->
       @parentId?
@@ -118,14 +138,21 @@ angular.module('loomioApp').factory 'GroupModel', (BaseModel, AppConfig) ->
         '/img/default-logo-medium.png'
 
     coverUrl: ->
-      if @coverUrlDesktop
-        @coverUrlDesktop
-      else if @isSubgroup()
+      if @isSubgroup() && !@hasCustomCover
         @parent().coverUrl()
       else
-        '/img/default-cover-photo.png'
+        @coverUrlDesktop
 
     archive: =>
       @remote.patchMember(@key, 'archive').then =>
-        @recordsInterface.collection.remove(@)
+        @remove()
+        _.each @memberships(), (m) -> m.remove()
 
+    uploadPhoto: (file, kind) =>
+      @remote.upload("#{@key}/upload_photo/#{kind}", file)
+
+    trialIsOverdue: ->
+      @subscriptionKind == 'trial' && @subscriptionExpiresAt.clone().add(1, 'days') < moment()
+
+    noInvitationsSent: ->
+      @membershipsCount < 2 and @invitationsCount < 2

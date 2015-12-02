@@ -1,9 +1,7 @@
-angular.module('loomioApp').controller 'DashboardPageController', ($rootScope, $scope, Records, CurrentUser, LoadingService, ThreadQueryService) ->
+angular.module('loomioApp').controller 'DashboardPageController', ($rootScope, $scope, Records, CurrentUser, LoadingService, ThreadQueryService, AppConfig) ->
   $rootScope.$broadcast('currentComponent', { page: 'dashboardPage' })
   $rootScope.$broadcast('setTitle', 'Dashboard')
   $rootScope.$broadcast('analyticsClearGroup')
-
-  Records.votes.fetchMyRecentVotes()
 
   @perPage = 50
   @loaded =
@@ -33,17 +31,17 @@ angular.module('loomioApp').controller 'DashboardPageController', ($rootScope, $
     _.contains ['show_muted'], @filter
 
   @updateQueries = =>
-    @currentBaseQuery = ThreadQueryService.filterQuery(@filter)
+    @currentBaseQuery = ThreadQueryService.filterQuery(['only_threads_in_my_groups', @filter])
     if @displayByGroup()
       _.each @groups(), (group) =>
         @views.groups[group.key] = ThreadQueryService.groupQuery(group, { filter: @filter, queryType: 'all' })
     else
-      @views.recent.proposals = ThreadQueryService.filterQuery ['show_proposals', @filter], queryType: 'important'
-      @views.recent.starred   = ThreadQueryService.filterQuery ['show_starred', 'hide_proposals', @filter], queryType: 'important'
+      @views.recent.proposals = ThreadQueryService.filterQuery ['only_threads_in_my_groups', 'show_not_muted', 'show_proposals', @filter], queryType: 'important'
+      @views.recent.starred   = ThreadQueryService.filterQuery ['show_not_muted', 'show_starred', 'hide_proposals', @filter], queryType: 'important'
       _.each @timeframeNames, (name) =>
         @views.recent[name] = ThreadQueryService.timeframeQuery
           name: name
-          filter: @filter
+          filter: ['only_threads_in_my_groups', 'show_not_muted', @filter]
           timeframe: @timeframes[name]
 
   @loadMore = =>
@@ -56,15 +54,15 @@ angular.module('loomioApp').controller 'DashboardPageController', ($rootScope, $
       per:    @perPage).then @updateQueries
   LoadingService.applyLoadingFunction @, 'loadMore'
 
-  @refresh = =>
-    @updateQueries()
-    @loadMore() if @loaded[@filter] == 0
+  @loading = -> !AppConfig.membershipsLoaded
 
   @setFilter = (filter = 'show_all') =>
     @filter = filter
-    @refresh()
-  @setFilter()
+    @updateQueries()
+    @loadMore() if @loaded[@filter] == 0
+  @setFilter() unless @loading()
+
+  $scope.$on 'currentUserMembershipsLoaded', => @setFilter()
   $scope.$on 'homePageClicked', => @setFilter()
-  $scope.$on 'starToggled', @refresh
 
   return

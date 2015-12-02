@@ -13,8 +13,8 @@ describe 'LmoUrlService', ->
     beforeEach inject (LmoUrlService) -> service = LmoUrlService
     beforeEach ->
       inject (Records) ->
-        group = Records.groups.importJSON id: 1, name: 'Group Name', key: 'gkey'
-        subgroup = Records.groups.importJSON id: 2, parent_id: group.id, name: 'Subgroup Name', key: 'sgkey'
+        group = Records.groups.importJSON id: 1, name: 'Group Name', full_name: 'Group Name', key: 'gkey'
+        subgroup = Records.groups.importJSON id: 2, parent_id: group.id, name: 'Subgroup Name', full_name: 'Group Name - Subgroup Name', key: 'sgkey'
         thread = Records.discussions.importJSON id: 1, title: 'Discussion Title', key: 'dkey'
         proposal = Records.proposals.importJSON id: 1, discussion_id: thread.id, name: 'Proposal Name', key: 'pkey'
         comment = Records.comments.importJSON id:1, discussion_id: thread.id, key: 'ckey'
@@ -52,11 +52,11 @@ describe 'LmoUrlService', ->
 
     describe 'proposal', ->
       it 'gives a proposal path', ->
-        expect(service.proposal(proposal)).toBe("/m/#{proposal.key}/proposal-name")
+        expect(service.proposal(proposal)).toBe("/d/#{proposal.discussion().key}/discussion-title?proposal=#{proposal.key}")
 
       it 'can pass query parameters', ->
-        expect(service.proposal(proposal, { position: 'yes', utm_medium: 'medium'})).toBe("/m/#{proposal.key}/proposal-name?position=yes&utm_medium=medium")
+        expect(service.proposal(proposal, { position: 'yes', utm_medium: 'medium'})).toBe("/d/#{proposal.discussion().key}/discussion-title?position=yes&utm_medium=medium&proposal=#{proposal.key}")
 
     describe 'comment', ->
       it 'gives a comment path', ->
-        expect(service.comment(comment)).toBe("/d/#{thread.key}/discussion-title?comment=#{comment.key}")
+        expect(service.comment(comment)).toBe("/d/#{thread.key}/discussion-title?comment=#{comment.id}")

@@ -46,6 +46,8 @@ es:
         subject: Alguien te ha invitado a unirte a su grupo en Loomio
     registrations:
       sign_up: Crear cuenta
+    sessions:
+      signed_out: "Sesión cerrada satisfactoriamente "
   error:
     access_denied: No tienes permisos para hacer esto.
     cant_join_subgroup: No puedes unirte a un subgrupo si no eres miembro del grupo superior.
@@ -284,7 +286,6 @@ es:
     email_error: No es una dirección de correo electrónico valida.
     group_name: Nombre del grupo
     group_name_error: "Se requiere el nombre del grupo. "
-    pricing_html: "En 30 días, cuando hayas visto cómo Loomio mejora la forma de organizarse de tu grupo, te pediremos que elijas la <a href='%{link}' target='_blank'>forma de pago</a> que consideres oportuna."
     terms_html: "Al empezar un grupo, aceptas los <a href='%{link}' target='_blank'>términos de servicio</a> de Loomio."
     success:
       header: "¡Ya casi has terminado! Revisa tu correo electrónico. "
@@ -669,12 +670,20 @@ es:
     vote: Puedes cambiar tu posición en cualquier momento
   pricing_page:
     header: Precio
-    social_mission_html: "Nuestro modelo de pago está enfocado a nuestra misión social: <strong>facilitar a todas las personas, en cualquier parte, participar en las decisiones que les afectan </strong>."
-    loomio_for_organisations: "Loomio para organizaciones "
-    organisations_deal_html: "Si estás usando Loomio en una empresa, organización formal o negocio, el precio es de 1$ US mensual por persona, tras el <strong> periodo de prueba gratuito de 30 días </strong>."
-    discuss_options_html: "Si quieres discutir las opciones de pago para que encajen con tu organización, <a href=/contact#contact-form target='_blank'>contacta con nosotros</a>."
-    loomio_for_communities: "Loomio para comunidades "
-    communities_deal: "El dinero nunca sera una barrera para personas usando Loomio para hacer mejoras en sus comunidades. Si tu grupo no tiene presupuesto para pagar el software, no tienes que pagar la suscripción. Sin embrago, les pediremos ocasionalmente, a los miembros de tu grupo una donación voluntaria."
+    gift: Regalo
+    standard: "Estándar "
+    plus: Más
+    free_trial_html: "Te pediremos que elijas tu plan de pago luego de <span>30 días de prueba gratis</span>. No requiere tarjeta de crédito. "
+    get_started_for_free: "Comienza gratis "
+    gift_body_html: "<p> Para grupos que no tienen el presupuesto para pagar una suscripción.</p>\n<p> Usándolo a donación, sin un pago regular requerido.</p>\n"
+    gift_donation_ask: Le pediremos a los miembros de tu grupo por una donación.
+    unlimited_members: Cantidad ilimitada de miembros
+    unlimited_decisions: "Cantidad ilimitada de decisiones "
+    email_support: "soporte por correo electrónico "
+    plus_body: "Todo en Estándar, más: "
+    premium_support: "soporte especial "
+    custom_url: "URL personalizado "
+    usage_statistics: Estadísticas de uso
   contribution:
     any_amount: "Cualquier contribución única "
     currency_desc: La suma está en dólares americanos
@@ -751,7 +760,6 @@ es:
     invites_more_help2: "<p>Puedes invitar a personas a tu grupo en cualquier momento.</p><p>Podrías invitar a todos los miembros del grupo de una sola vez, o puedes empezar invitando solo a los que trabajan contigo diariamente.</p>"
     invitation_link: Enlace a la invitación
     discussion_link: "Participa en la discusión:"
-    link_help: "Haz clic en este enlace para unirte a %{group} en loomio:"
     copy: "Si alguien no ha recibido la invitación electrónica, no dudes en copiar el enlace de arriba y enviarlo personalmente."
     pending_invitations: Invitaciones pendientes
     no_pending_invitations: "Actualmente, no hay invitaciones pendientes"
@@ -763,12 +771,6 @@ es:
     empty_search: Búsqueda vacía
     please_enter_a_search: "Por favor, introduce una consulta en la barra de búsqueda superior"
     no_match: No hubo resultados que coincidan con tu consulta
-  example_discussion:
-    title: "Discusión de ejemplo: Bienvenida e introducción a Loomio"
-    description: "Bienvenidos a Loomio, una herramienta para la toma de decisiones en grupo.⏎ \nAl participar en un tema, discutiendo diferentes puntos de vista e información, haciendo frente a cualquier problema que se presente, tu grupo puede juntarse  y encontrar el mejor camino a seguir. ⏎\nPuedes utilizar la discusión de ejemplo y jugar con las de la herramienta. ⏎\n"
-  example_motion:
-    name: "¡Deberíamos irnos de vacaciones a la luna!"
-    description: "Loomio Helper Bot está muy interesado en que tu grupo invierta en un viaje a la luna. Al parecer, el espacio queso es delicioso. Pero las implicaciones por la huella de carbono son preocupantes. ⏎\n¿Es una buena idea? Loomio Helper Bot quiere saber lo que piensas! ⏎\nSi estás convencido de tu posición, haz clic en uno de los iconos de abajo (pulsa el cursor sobre los botones de decisiones para una descripción de lo que cada uno de ellos significa). ⏎\nSe te pedirá que realices una breve declaración sobre la razón de tu decisión. Esto hace que sea fácil de ver en forma de resumen de lo que todos piensan y por qué. Puedes cambiar de opinión y editar tu decisión libremente hasta que la propuesta se cierra. ⏎ \n"
   contact_page:
     contact_us: Contáctanos
     faq_prompt_html: "Tienes una pregunta para el equipo de Loomio? antes de contactarnos, quizás puedas encontrar la respuesta en nuestra sección de preguntas frecuentes."
@@ -1159,3 +1161,11 @@ es:
     media: Medios de comunicación
     health: Salud
   start_your_group: Empieza un grupo
+  webhooks:
+    slack:
+      motion_closed: "*%{name}* ha cerrado"
+      motion_closing_soon: "*%{name}* tiene una propuesta cerrando en 24 horas"
+      motion_outcome_created: "*%{author}* publico un resultado en *%{name}*"
+      motion_outcome_updated: "*%{author}* actualizo el resultado para *%{name}*"
+      new_motion: "*%{author}* comenzó una nueva propuesta en *%{name}*"
+      view_it_on_loomio: Velo en Loomio

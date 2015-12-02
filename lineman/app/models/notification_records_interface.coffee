@@ -11,9 +11,8 @@ angular.module('loomioApp').factory 'NotificationRecordsInterface', (BaseRecords
 
     viewed: ->
       any = false
-      _.each @collection.find({viewed: false}), (n) =>
+      _.each @collection.find(viewed: { $ne: true}), (n) =>
         any = true
-        n.viewed = true
-        @collection.update(n)
+        n.update(viewed: true)
 
       @remote.post 'viewed' if any

@@ -389,6 +389,7 @@ cs:
     declined: "Odmítnul %{name}"
     threads: Diskuze
     groups: Skupiny
+    join: Připojit se
   group_request:
     header: Vytvořit skupinu
     commercial_use_option: "ve firmě, formální organizaci nebo na pracovišti"
@@ -455,6 +456,7 @@ cs:
   move_discussion_where: Kam chcete tuto diskuzi přesunout?
   delete_discussion: Odstranit diskuzi
   confirm_delete_discussion: Opravdu chcete navždy odstranit tuto diskuzi?
+  print_tooltip_info: Ttisk
   new_proposal: Nový návrh
   edit_proposal: Upravit návrh
   close_proposal: Uzavřít návrh
@@ -535,6 +537,10 @@ cs:
     vote: Můžete kdykoliv svůj postoj změnit
   pricing_page:
     header: Ceník
+    email_support: e-mailová podpora
+    premium_support: prémiová podpora
+    custom_url: vlastní URL
+    usage_statistics: statistiky využití
   contribution:
     any_amount: nebo jednorázový příspěvek
     currency_desc: Částky jsou uvedeny v amerických dolarech
@@ -594,7 +600,6 @@ cs:
     invites_more_help2: "<p>Do této skupiny můžete kdykoliv pozvat lidi.</p><p>Možná chcete rovnou pozvat všechny členy, nebo můžete začít pozváním jen těch, s kterými pracujete nejvíce.</p>"
     invitation_link: Odkaz na pozvánku
     discussion_link: "Zapojte se do diskuze:"
-    link_help: "Kilkněte sem, abyste se přidali k %{group} na Loomiu:"
     copy: "Pokud někdo neobdržel svou pozvánku, neváhejte zkopírovat odkaz na pozvánku výše a poskytnout jej příjemci."
     pending_invitations: Nevyřízené pozvánky
     no_pending_invitations: Nemáte zatím žádné nevyřízené pozvánky
@@ -605,12 +610,9 @@ cs:
     empty_search: Prázdné vyhledávání
     please_enter_a_search: Prosím zadejte výraz do vyhledávacího pole výše
     no_match: Žádné výsledky neodpovídali vašemu výrazu
-  example_discussion:
-    title: "Ukázková diskuze: Úvítání a úvod do Loomio"
-  example_motion:
-    name: "Měli bychom mít dovolenou na měsíci!"
   contact_page:
     contact_us: Kontaktujte nás
+    contact_form: Kontaktní formulář
     labels:
       name: Vaše jméno
       email: Vaše emailová adresa
@@ -779,6 +781,7 @@ cs:
   about_loomio: O Loomio
   ago: "před %{quantity_of_time}"
   approve: Schválit
+  attachments: "Přílohy:"
   author: Autor
   back: Zpět
   cancel: Zrušit
@@ -957,3 +960,6 @@ cs:
     women: Ženy
     media: Média
     health: Zdraví
+  webhooks:
+    slack:
+      view_it_on_loomio: Zobrazení na Loomio

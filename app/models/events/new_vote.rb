@@ -5,11 +5,7 @@ class Events::NewVote < Event
                     discussion: vote.motion.discussion,
                     created_at: vote.created_at)
 
-    dr = DiscussionReader.for(discussion: vote.motion.discussion, user: vote.author)
-    dr.set_volume_as_required!
-    dr.participate!
-
-    UsersToEmailQuery.new_vote(vote).find_each do |user|
+    BaseMailer.send_bulk_mail(to: UsersToEmailQuery.new_vote(vote)) do |user|
       ThreadMailer.delay.new_vote(user, event)
     end
 

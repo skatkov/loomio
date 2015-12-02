@@ -9,12 +9,24 @@ angular.module('loomioApp', ['ngNewRouter',
                              'angular-inview',
                              'ui.gravatar',
                              'truncate',
-                             'duScroll']).config ($httpProvider, $locationProvider, $translateProvider, markedProvider, $compileProvider) ->
+                             'duScroll',
+                             'monospaced.elastic']).config ($httpProvider, $locationProvider, $translateProvider, markedProvider, $compileProvider, $animateProvider) ->
+
+  # this should make stuff faster but you need to add "animated" class to animated things.
+  # http://www.bennadel.com/blog/2935-enable-animations-explicitly-for-a-performance-boost-in-angularjs.htm
+  $animateProvider.classNameFilter( /\banimated\b/ );
 
   #configure markdown
+  applyMentionsFor = (tag, text)->
+    text = text.replace(/\[\[@([a-zA-Z0-9]+)\]\]/g, "<a class='lmo-user-mention' href='/u/$1'>@$1</a>")
+    "<#{tag}>#{text}</#{tag}>"
+
   renderer = new marked.Renderer()
   renderer.link = (href, title, text) ->
-    "<a href='" + href + "' title='" + title + "' target='_blank'>" + text + "</a>";
+    "<a href='" + href + "' title='" + (title || text) + "' target='_blank'>" + text + "</a>";
+  renderer.paragraph = (text) -> applyMentionsFor 'p', text
+  renderer.listitem  = (text) -> applyMentionsFor 'li', text
+  renderer.tablecell = (text) -> applyMentionsFor 'td', text
 
   markedProvider.setOptions
     renderer: renderer
@@ -22,11 +34,7 @@ angular.module('loomioApp', ['ngNewRouter',
     sanitize: true
     breaks: true
 
-  # consume the csrf token from the page so form submissions can work
-  authToken = $("meta[name=\"csrf-token\"]").attr("content")
-  $httpProvider.defaults.headers.common["X-CSRF-TOKEN"] = authToken
-
-  # enabled html5 pushstate mode
+  # enable html5 pushstate mode
   $locationProvider.html5Mode(true)
 
   if window.Loomio?
@@ -34,31 +42,32 @@ angular.module('loomioApp', ['ngNewRouter',
     $translateProvider.useUrlLoader("/api/v1/translations").
                        preferredLanguage(locale)
 
-    $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
+    $translateProvider.useSanitizeValueStrategy('escapeParameters');
 
-  # stuff that only runs in production environment
+  # disable angular debug stuff in production
   if window.Loomio? and window.Loomio.environment == 'production'
-    # disable angular debug stuff in production
     $compileProvider.debugInfoEnabled(false);
 
 # Finally the Application controller lives here.
-angular.module('loomioApp').controller 'ApplicationController', ($scope, $filter, $rootScope, $router, KeyEventService, ScrollService, AnalyticsService, CurrentUser, MessageChannelService) ->
+angular.module('loomioApp').controller 'ApplicationController', ($scope, $location, $filter, $rootScope, $router, KeyEventService, ScrollService, CurrentUser, BootService, AppConfig, ModalService, ChoosePlanModal) ->
+  BootService.boot()
+
   $scope.currentComponent = 'nothing yet'
 
   $scope.$on 'currentComponent', (event, options = {}) ->
     $scope.pageError = null
-    ScrollService.scrollTo(options['scrollTo'] or 'h1:first')
+    ScrollService.scrollTo(options['scrollTo'] or 'h1')
 
   $scope.$on 'setTitle', (event, title) ->
-    angular.element.find('title')[0].text = _.trunc(title, 300) + ' | Loomio'
+    document.querySelector('title').text = _.trunc(title, 300) + ' | Loomio'
 
   $scope.$on 'pageError', (event, error) ->
     $scope.pageError = error
 
-  $scope.$on 'currentUserMembershipsLoaded', ->
-    _.each CurrentUser.groups(), (group) ->
-      MessageChannelService.subscribeTo "/group-#{group.key}"
-
+  $scope.$on 'trialIsOverdue', (event, group) ->
+    if CurrentUser.id == group.creatorId and AppConfig.chargify and !AppConfig.chargify.nagCache[group.key]
+      ModalService.open ChoosePlanModal, group: -> group
+      AppConfig.chargify.nagCache[group.key] = true
 
   $scope.keyDown = (event) -> KeyEventService.broadcast event
 
@@ -75,8 +84,11 @@ angular.module('loomioApp').controller 'ApplicationController', ($scope, $filter
     {path: '/m/:key/votes/new', component: 'proposalRedirect' },
     {path: '/g/:key/memberships', component: 'membershipsPage'},
     {path: '/g/:key/membership_requests', component: 'membershipRequestsPage'},
+    {path: '/g/:key/previous_proposals', component: 'previousProposalsPage'},
     {path: '/g/:key', component: 'groupPage' },
     {path: '/g/:key/:stub', component: 'groupPage' }
+    {path: '/u/:key', component: 'userPage' }
+    {path: '/u/:key/:stub', component: 'userPage' }
   ])
 
   return

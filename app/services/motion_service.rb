@@ -4,9 +4,13 @@ class MotionService
     actor.ability.authorize! :create, motion
     return false unless motion.valid?
     motion.save!
-    ThreadSearchService.index! motion.discussion_id
-    DiscussionReader.for(discussion: motion.discussion, user: actor).set_volume_as_required!
-    Events::NewMotion.publish!(motion)
+
+    Draft.purge(user: actor, draftable: motion.discussion, field: :motion)
+    SearchVector.index! motion.discussion_id
+
+    event = Events::NewMotion.publish!(motion)
+    DiscussionReader.for(discussion: motion.discussion, user: motion.author).author_thread_item!(motion.created_at)
+    event
   end
 
   def self.update(motion:, params:, actor:)
@@ -16,29 +20,13 @@ class MotionService
     end
 
     motion.attributes = params
-
     actor.ability.authorize! :update, motion
+    return false unless motion.valid?
 
-    if motion.valid?
-      sync_search_vector = motion.name_changed? || motion.description_changed?
-
-      if motion.name_changed?
-        Events::MotionNameEdited.publish!(motion, actor)
-      end
-
-      if motion.description_changed?
-        Events::MotionDescriptionEdited.publish!(motion, actor)
-      end
-
-      if motion.closing_at_changed?
-        Events::MotionCloseDateEdited.publish!(motion, actor)
-      end
-
-      motion.save
-      ThreadSearchService.index! motion.discussion_id if sync_search_vector
-    else
-      false
-    end
+    motion.save!
+    event = Events::MotionEdited.publish!(motion, actor)
+    SearchVector.index! motion.discussion_id
+    event
   end
 
   def self.close_all_lapsed_motions

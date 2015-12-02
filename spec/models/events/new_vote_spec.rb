@@ -18,13 +18,14 @@ describe Events::NewVote do
       Events::NewVote.publish!(vote)
     end
 
-    it 'marks the discussion reader as participating' do
-      Events::NewVote.publish!(vote)
-      expect(DiscussionReader.for(user: vote.author, discussion: discussion).participating).to be_truthy
-    end
-
     it 'returns an event' do
       expect(Events::NewVote.publish!(vote)).to eq event
+    end
+  end
+
+  describe 'channel_object' do
+    it 'uses the group as a channel object' do
+      expect(Events::NewVote.publish!(vote).send(:channel_object)).to eq discussion.group
     end
   end
 end
