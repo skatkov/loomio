@@ -1,13 +1,10 @@
 class API::MembershipsController < API::RestfulController
 
   def add_to_subgroup
-    p({group_id: params[:group_id],
-       parent_group_id: params[:parent_group_id],
-       user_ids: params[:user_ids]})
     parent_group = current_user.groups.find_by_id!(params[:parent_group_id])
     group = current_user.groups.find_by_id!(params[:group_id])
 
-    users = parent_group.members.where('users.id IN (?)', user_ids)
+    users = parent_group.members.where('users.id IN (?)', params[:user_ids])
     @memberships = MembershipService.add_users_to_group(users: users,
                                                         group: group,
                                                         inviter: current_user)

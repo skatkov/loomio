@@ -610,6 +610,7 @@ en:
 
   add_members_modal:
     heading: 'Add people from {{name}}'
+    add_members: 'Add members'
 
   memberships_page:
     members: 'Members'

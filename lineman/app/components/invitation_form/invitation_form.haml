@@ -19,7 +19,7 @@
     %p
       %span{translate: 'invitation_form.team_invitation_message'}>
       %button.invitation-form__get-team-link.lmo-btn-link--blue{translate: 'invitation_form.team_invitation_link', ng-click: 'getTeamLink()'}>
-    %p
+    %p{ng-if: 'group.isSubgroup()'}
       %button.invitation-form__add-members.lmo-btn-link--blue{translate: 'invitation_form.add_members', ng-click: 'addMembers()'}>
       %span{translate: 'invitation_form.from_parent_group', translate-values:'{name: group.parentName()}'}
 

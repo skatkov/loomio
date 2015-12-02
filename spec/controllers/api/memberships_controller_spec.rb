@@ -28,17 +28,18 @@ describe API::MembershipsController do
   end
 
   describe 'add_to_subgroup', focus: true do
-    let(:parent_member) { FactoryGirl.create(:user) }
-    let(:parent_group) { FactoryGirl.create(:group) }
-
-    before do
-      parent_group.add_member!(parent_member)
-      group.parent = parent_group
-      group.subscription = nil
-      group.save!
-    end
-
     context 'permitted' do
+      let(:parent_member) { FactoryGirl.create(:user) }
+      let(:parent_group) { FactoryGirl.create(:group) }
+
+      before do
+        parent_group.add_member!(user)
+        parent_group.add_member!(parent_member)
+        group.parent = parent_group
+        group.subscription = nil
+        group.save!
+      end
+
       it "adds parent members to subgroup" do
         post(:add_to_subgroup, {group_id: group.id,
                                 parent_group_id: parent_group.id,
@@ -56,7 +57,7 @@ describe API::MembershipsController do
                                 user_ids: [alien_named_bang.id]})
 
         json = JSON.parse(response.body)
-        raise json.inspect
+        expect(json['memberships'].length).to eq 0
       end
     end
   end
