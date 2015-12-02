@@ -27,6 +27,40 @@ describe API::MembershipsController do
     sign_in user
   end
 
+  describe 'add_to_subgroup', focus: true do
+    let(:parent_member) { FactoryGirl.create(:user) }
+    let(:parent_group) { FactoryGirl.create(:group) }
+
+    before do
+      parent_group.add_member!(parent_member)
+      group.parent = parent_group
+      group.subscription = nil
+      group.save!
+    end
+
+    context 'permitted' do
+      it "adds parent members to subgroup" do
+        post(:add_to_subgroup, {group_id: group.id,
+                                parent_group_id: parent_group.id,
+                                user_ids: [parent_member.id]})
+
+        json = JSON.parse(response.body)
+        expect(json.keys).to include *(%w[users memberships groups])
+
+        expect(group.members).to include(parent_member)
+      end
+
+      it "does not add aliens to subgroup" do
+        post(:add_to_subgroup, {group_id: group.id,
+                                parent_group_id: parent_group.id,
+                                user_ids: [alien_named_bang.id]})
+
+        json = JSON.parse(response.body)
+        raise json.inspect
+      end
+    end
+  end
+
   describe 'index' do
     context 'success' do
       it 'returns users filtered by group' do

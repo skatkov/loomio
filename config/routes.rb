@@ -46,6 +46,7 @@ Loomio::Application.routes.draw do
 
     resources :memberships, only: [:index, :create, :update, :destroy] do
       collection do
+        post :add_to_subgroup
         post :join_group
         get :autocomplete
         get :for_user
