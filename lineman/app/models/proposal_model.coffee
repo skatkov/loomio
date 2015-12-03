@@ -89,6 +89,9 @@ angular.module('loomioApp').factory 'ProposalModel', (BaseModel, AppConfig) ->
       else
         @recordStore.users.find(_.pluck(@didNotVotes(), 'userId'))
 
+    hasUndecidedMembers: ->
+      _.any @undecidedMembers()
+
     createOutcome: =>
       @remote.postMember @id, "create_outcome",
         motion:
