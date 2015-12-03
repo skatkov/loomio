@@ -1,5 +1,5 @@
 angular.module('loomioApp').directive 'translateButton', ->
-  scope: {model: '='}
+  scope: {model: '=', showdot: '=?'}
   restrict: 'E'
   templateUrl: 'generated/components/translate_button/translate_button.html'
   replace: true
