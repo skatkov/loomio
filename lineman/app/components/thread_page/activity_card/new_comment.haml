@@ -19,7 +19,11 @@
       .sr-only{ng-if: '!comment.parentId', id: 'event-{{event.id}}', translate: 'new_comment_item.aria_label', translate-value-author: '{{comment.authorName()}}'}
 
   .thread-item__body.lmo-markdown-wrapper{marked: 'comment.cookedBody()' }
-  .lmo-translated.lmo-markdown-wrapper{ng-if: 'translated', marked: 'translated'}
+
+  .thread-item__translated{ng-if: 'translated'}
+    %hr
+    .lmo-translated.thread-item__body.lmo-markdown-wrapper{marked: 'translated'}
+    %hr
 
   .thread-item__attachments
     .thread-item__attachment{ng-repeat: 'attachment in comment.attachments() track by attachment.id'}
