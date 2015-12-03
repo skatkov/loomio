@@ -1,0 +1,6 @@
+.translate-button
+  %span{aria-hidden: 'true', ng-if: 'canTranslate() || translateExecuting || translated'}·
+  %a.thread-item__translate{ng-if: 'canTranslate()', href: '', ng-click: 'translate()', translate: 'common.action.translate'}>
+  %loading.translate-button__loading{ng-show: 'translateExecuting'}
+  %span.thread-item__translation{ng-if: 'translated', translate: 'common.action.translated'}>
+  %span{aria-hidden: 'true'}·

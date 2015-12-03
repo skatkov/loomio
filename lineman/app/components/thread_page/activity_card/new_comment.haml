@@ -20,10 +20,7 @@
 
   .thread-item__body.lmo-markdown-wrapper{marked: 'comment.cookedBody()' }
 
-  .thread-item__translated{ng-if: 'translated'}
-    %hr
-    .lmo-translated.thread-item__body.lmo-markdown-wrapper{marked: 'translated'}
-    %hr
+  %translation{ng-if: 'translation', translation: 'translation', field: 'body'}
 
   .thread-item__attachments
     .thread-item__attachment{ng-repeat: 'attachment in comment.attachments() track by attachment.id'}
@@ -35,11 +32,7 @@
       %button.thread-item__action{type: 'button', translate: 'common.action.unlike', ng_click: 'unlike()', ng-show: 'currentUserLikesIt()'}>
       %span{aria-hidden: 'true'}·
       %button.thread-item__action.thread-item__action--reply{translate: 'common.action.reply', type: 'button', ng_click: 'reply()'}>
-      %span{aria-hidden: 'true', ng-if: 'canTranslate() || translateExecuting || translated'}·
-      %a.thread-item__translate{ng-if: 'canTranslate()', href: '', ng-click: 'translate()', translate: 'common.action.translate'}>
-      %loading.lmo-translation-loading{ng-show: 'translateExecuting'}
-      %span.thread-item__translation{ng-if: 'translated', translate: 'common.action.translated'}>
-      %span{aria-hidden: 'true'}·
+      %translate_button{model: 'comment'}
       %a{lmo-href-for: 'comment'}>
         %timeago{timestamp: 'comment.createdAt' }>
 

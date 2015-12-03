@@ -105,7 +105,6 @@ angular.module('loomioApp').factory 'AbilityService', (CurrentUser) ->
     canViewGroup: (group) ->
       !group.privacyIsSecret() or
       CurrentUser.isMemberOf(group)
-      # (group.visibleToOrganisation() and CurrentUser.isMemberOf(group.parent()))
 
     canViewMemberships: (group) ->
       CurrentUser.isMemberOf(group)
@@ -123,3 +122,6 @@ angular.module('loomioApp').factory 'AbilityService', (CurrentUser) ->
       @canViewGroup(group) and
       !CurrentUser.isMemberOf(group) and
       !group.hasPendingMembershipRequestFrom(CurrentUser)
+
+    canTranslate: (model) ->
+      CurrentUser.locale != model.author().locale
