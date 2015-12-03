@@ -24,3 +24,6 @@ angular.module('loomioApp').directive 'proposalExpanded', ->
 
     $scope.showOutcomePanel = ->
       $scope.proposal.hasOutcome() or AbilityService.canCreateOutcomeFor($scope.proposal)
+
+    $scope.$on 'translationComplete', (e, translatedFields) ->
+      $scope.translation = translatedFields
